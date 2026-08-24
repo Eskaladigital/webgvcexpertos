@@ -2,6 +2,7 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { BackToTop } from '@/components/ui/BackToTop'
+import { CookieBanner } from '@/components/ui/CookieBanner'
 // import { Toaster } from '@/components/ui/toaster' // Comentado temporalmente si no existe
 import { siteConfig } from '@/config/site'
 import { NextIntlClientProvider } from 'next-intl'
@@ -130,6 +131,7 @@ export default async function LocaleLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <CookieBanner />
         <BackToTop />
       </NextIntlClientProvider>
     </div>

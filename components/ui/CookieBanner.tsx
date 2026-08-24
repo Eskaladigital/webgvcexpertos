@@ -19,13 +19,27 @@ export function CookieBanner() {
     }
   }, [])
 
+  const updateGtag = (granted: boolean) => {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      const value = granted ? 'granted' : 'denied'
+      ;(window as any).gtag('consent', 'update', {
+        analytics_storage: value,
+        ad_storage: value,
+        ad_user_data: value,
+        ad_personalization: value,
+      })
+    }
+  }
+
   const acceptCookies = () => {
     localStorage.setItem('cookie_consent', 'accepted')
+    updateGtag(true)
     setIsVisible(false)
   }
 
   const rejectCookies = () => {
     localStorage.setItem('cookie_consent', 'rejected')
+    updateGtag(false)
     setIsVisible(false)
   }
 
