@@ -3,10 +3,11 @@ import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { siteConfig } from '@/config/site'
 
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   
   return {
@@ -20,11 +21,12 @@ export async function generateMetadata({
   }
 }
 
-export default function AvisoLegalPage({
-  params: { locale }
+export default async function AvisoLegalPage({
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   
   return (

@@ -37,25 +37,26 @@ export function generateStaticParams() {
 }
 
 // Generar metadata dinámica
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { locale: string; ciudad: string }
-}): Metadata {
-  const city = cities.find((c) => c.slug === params.ciudad)
+  params: Promise<{ locale: string; ciudad: string }>
+}): Promise<Metadata> {
+  const { locale, ciudad } = await params
+  const city = cities.find((c) => c.slug === ciudad)
 
   if (!city) {
     return { title: 'Página no encontrada' }
   }
 
-  const isSpanish = params.locale === 'es'
+  const isSpanish = locale === 'es'
   const title = isSpanish
     ? `Abogados Negligencias Médicas ${city.name} | ${siteConfig.name}`
     : `Medical Negligence Lawyers ${city.name} | ${siteConfig.name}`
   const description = isSpanish
     ? `Abogados especializados en negligencias médicas en ${city.name}, ${city.province}. Bufete con trayectoria desde 1946. ☎ ${siteConfig.contact.phone}`
     : `Lawyers specialized in medical negligence in ${city.name}, ${city.province}. Law firm with track record since 1946. ☎ ${siteConfig.contact.phone}`
-  const url = `${siteConfig.url}/${params.locale}/${city.slug}`
+  const url = `${siteConfig.url}/${locale}/${city.slug}`
 
   return {
     title,
@@ -128,9 +129,10 @@ function getCityCoordinates(citySlug: string) {
 export default async function CiudadPage({
   params,
 }: {
-  params: { locale: string; ciudad: string }
+  params: Promise<{ locale: string; ciudad: string }>
 }) {
-  const city = cities.find((c) => c.slug === params.ciudad)
+  const { locale, ciudad } = await params
+  const city = cities.find((c) => c.slug === ciudad)
 
   if (!city) {
     notFound()
@@ -140,10 +142,10 @@ export default async function CiudadPage({
   const hospitals = await getHospitalsForCity(city.name)
   const coords = getCityCoordinates(city.slug)
 
-  const isSpanish = params.locale === 'es'
+  const isSpanish = locale === 'es'
   
   // Traducciones para servicios
-  const tServices = await getTranslations({ locale: params.locale, namespace: 'services' })
+  const tServices = await getTranslations({ locale: locale, namespace: 'services' })
   
   // Mapeo de slugs español a inglés para traducciones
   const serviceSlugMap: Record<string, string> = {
@@ -331,7 +333,7 @@ export default async function CiudadPage({
             name: isSpanish 
               ? `Abogados Negligencias Médicas ${city.name}` 
               : `Medical Negligence Lawyers ${city.name}`, 
-            url: `${siteConfig.url}/${params.locale}/${city.slug}` 
+            url: `${siteConfig.url}/${locale}/${city.slug}` 
           },
         ]}
       />
@@ -389,7 +391,7 @@ export default async function CiudadPage({
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <Link href={`/${params.locale}/contacto`} className="btn-primary text-center">
+              <Link href={`/${locale}/contacto`} className="btn-primary text-center">
                 {isSpanish ? 'Háblanos de Tu Caso' : 'Tell Us About Your Case'}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
@@ -452,7 +454,7 @@ export default async function CiudadPage({
               return (
                 <Link
                   key={service.slug}
-                  href={`/${params.locale}/negligencias-medicas/${service.slug}`}
+                  href={`/${locale}/negligencias-medicas/${service.slug}`}
                   className="group p-8 bg-cream hover:bg-white rounded-lg transition-all duration-300 hover:shadow-lg border border-transparent hover:border-gold/20"
                 >
                   <div className="w-14 h-14 bg-gold/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-gold/20 transition-colors">
@@ -540,7 +542,7 @@ export default async function CiudadPage({
                   ? `¿Tu caso ocurrió en otro hospital de ${city.name}? También podemos ayudarte.`
                   : `Did your case occur at another hospital in ${city.name}? We can help you too.`}
               </p>
-              <Link href={`/${params.locale}/contacto`} className="btn-primary">
+              <Link href={`/${locale}/contacto`} className="btn-primary">
                 {isSpanish ? 'Consulta tu Caso' : 'Consult Your Case'}
               </Link>
             </div>
@@ -665,7 +667,7 @@ export default async function CiudadPage({
           </div>
 
           <div className="mt-12 text-center">
-            <Link href={`/${params.locale}/contacto`} className="btn-primary">
+            <Link href={`/${locale}/contacto`} className="btn-primary">
               {isSpanish ? 'Empezar mi Caso Ahora' : 'Start My Case Now'}
             </Link>
           </div>
@@ -707,7 +709,7 @@ export default async function CiudadPage({
                   ? '¿Tienes más preguntas? Contacta con nosotros.' 
                   : 'Have more questions? Contact us.'}
               </p>
-              <Link href={`/${params.locale}/preguntas-frecuentes`} className="text-gold font-semibold hover:text-gold-dark transition-colors inline-flex items-center gap-2">
+              <Link href={`/${locale}/preguntas-frecuentes`} className="text-gold font-semibold hover:text-gold-dark transition-colors inline-flex items-center gap-2">
                 {isSpanish ? 'Ver todas las preguntas frecuentes' : 'View all FAQs'}
                 <ArrowRight className="w-4 h-4" />
               </Link>

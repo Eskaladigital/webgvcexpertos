@@ -72,10 +72,11 @@ async function getNewsItem(slug: string, locale: string) {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string; locale: string }
+  params: Promise<{ slug: string; locale: string }>
 }): Promise<Metadata> {
-  const item = await getNewsItem(params.slug, params.locale)
-  const t = await getTranslations({ locale: params.locale, namespace: 'news' })
+  const { slug, locale } = await params
+  const item = await getNewsItem(slug, locale)
+  const t = await getTranslations({ locale, namespace: 'news' })
 
   if (!item) return { title: t('title') }
 
@@ -83,7 +84,7 @@ export async function generateMetadata({
     title: item.meta_title || item.title,
     description: item.meta_description || item.excerpt,
     alternates: {
-      canonical: `${siteConfig.url}/${params.locale}/noticias/${item.slug}`,
+      canonical: `${siteConfig.url}/${locale}/noticias/${item.slug}`,
     },
     openGraph: {
       type: 'article',
@@ -97,10 +98,11 @@ export async function generateMetadata({
 export default async function NewsItemPage({
   params,
 }: {
-  params: { slug: string; locale: string }
+  params: Promise<{ slug: string; locale: string }>
 }) {
-  const item = await getNewsItem(params.slug, params.locale)
-  const t = await getTranslations({ locale: params.locale, namespace: 'news' })
+  const { slug, locale } = await params
+  const item = await getNewsItem(slug, locale)
+  const t = await getTranslations({ locale, namespace: 'news' })
 
   if (!item) notFound()
 
@@ -124,7 +126,7 @@ export default async function NewsItemPage({
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               {new Date(item.published_at).toLocaleDateString(
-                params.locale === 'es' ? 'es-ES' : 'en-US',
+                locale === 'es' ? 'es-ES' : 'en-US',
                 { day: 'numeric', month: 'long', year: 'numeric' }
               )}
             </div>

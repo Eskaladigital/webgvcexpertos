@@ -437,11 +437,12 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { servicio: string; locale: string }
+  params: Promise<{ servicio: string; locale: string }>
 }): Promise<Metadata> {
-  const service = services.find((s) => s.slug === params.servicio)
-  const isSpanish = params.locale === 'es'
-  const tServices = await getTranslations({ locale: params.locale, namespace: 'services' })
+  const { servicio, locale } = await params
+  const service = services.find((s) => s.slug === servicio)
+  const isSpanish = locale === 'es'
+  const tServices = await getTranslations({ locale, namespace: 'services' })
   
   if (!service) {
     return {
@@ -472,7 +473,7 @@ export async function generateMetadata({
       ? `Abogados especializados en ${serviceTitle.toLowerCase()}. ${serviceDescription} Bufete desde 1946.`
       : `Lawyers specialized in ${serviceTitle.toLowerCase()}. ${serviceDescription} Law firm since 1946.`,
     alternates: {
-      canonical: `${siteConfig.url}/${params.locale}/negligencias-medicas/${service.slug}`,
+      canonical: `${siteConfig.url}/${locale}/negligencias-medicas/${service.slug}`,
       languages: {
         'es-ES': `${siteConfig.url}/es/negligencias-medicas/${service.slug}`,
         'en-US': `${siteConfig.url}/en/negligencias-medicas/${service.slug}`,
@@ -480,8 +481,8 @@ export async function generateMetadata({
     },
     openGraph: {
       type: 'website',
-      locale: params.locale === 'es' ? 'es_ES' : 'en_US',
-      url: `${siteConfig.url}/${params.locale}/negligencias-medicas/${service.slug}`,
+      locale: locale === 'es' ? 'es_ES' : 'en_US',
+      url: `${siteConfig.url}/${locale}/negligencias-medicas/${service.slug}`,
       title: isSpanish
         ? `${serviceTitle} | Abogados Especialistas`
         : `${serviceTitle} | Specialist Lawyers`,
@@ -512,21 +513,22 @@ export async function generateMetadata({
 export default async function ServicioPage({
   params,
 }: {
-  params: { servicio: string; locale: string }
+  params: Promise<{ servicio: string; locale: string }>
 }) {
-  const service = services.find((s) => s.slug === params.servicio)
-  const isSpanish = params.locale === 'es'
-  const t = await getTranslations({ locale: params.locale })
-  const tServices = await getTranslations({ locale: params.locale, namespace: 'services' })
-  const tNav = await getTranslations({ locale: params.locale, namespace: 'nav' })
+  const { servicio, locale } = await params
+  const service = services.find((s) => s.slug === servicio)
+  const isSpanish = locale === 'es'
+  const t = await getTranslations({ locale })
+  const tServices = await getTranslations({ locale, namespace: 'services' })
+  const tNav = await getTranslations({ locale, namespace: 'nav' })
   
   if (!service) {
     notFound()
   }
 
   const serviceContent = isSpanish ? serviceContentEs : serviceContentEn
-  const content = serviceContent[params.servicio]
-  const otherServices = services.filter((s) => s.slug !== params.servicio).slice(0, 3)
+  const content = serviceContent[servicio]
+  const otherServices = services.filter((s) => s.slug !== servicio).slice(0, 3)
   
   // Mapeo de slugs en español a slugs en inglés para traducciones
   const serviceSlugMap: Record<string, string> = {
@@ -553,8 +555,8 @@ export default async function ServicioPage({
             '@type': 'Service',
             name: serviceTitle,
             description: serviceDescription,
-            url: `${siteConfig.url}/${params.locale}/negligencias-medicas/${service.slug}`,
-            inLanguage: params.locale === 'es' ? 'es-ES' : 'en-US',
+            url: `${siteConfig.url}/${locale}/negligencias-medicas/${service.slug}`,
+            inLanguage: locale === 'es' ? 'es-ES' : 'en-US',
             provider: {
               '@type': 'LegalService',
               name: siteConfig.name,
@@ -562,10 +564,10 @@ export default async function ServicioPage({
             },
             areaServed: {
               '@type': 'Country',
-              name: params.locale === 'es' ? 'España' : 'Spain',
+              name: locale === 'es' ? 'España' : 'Spain',
             },
             serviceType: 'Legal Service',
-            category: params.locale === 'es' ? 'Negligencias Médicas' : 'Medical Negligence',
+            category: locale === 'es' ? 'Negligencias Médicas' : 'Medical Negligence',
           })
         }}
       />
@@ -574,11 +576,11 @@ export default async function ServicioPage({
           { name: isSpanish ? 'Inicio' : 'Home', url: siteConfig.url },
           { 
             name: isSpanish ? 'Negligencias Médicas' : 'Medical Negligence', 
-            url: `${siteConfig.url}/${params.locale}/negligencias-medicas` 
+            url: `${siteConfig.url}/${locale}/negligencias-medicas` 
           },
           { 
             name: serviceTitle, 
-            url: `${siteConfig.url}/${params.locale}/negligencias-medicas/${service.slug}` 
+            url: `${siteConfig.url}/${locale}/negligencias-medicas/${service.slug}` 
           },
         ]}
       />
@@ -611,7 +613,7 @@ export default async function ServicioPage({
             items={[
               { 
                 label: tNav('medical-negligence'), 
-                href: `/${params.locale}${isSpanish ? '/negligencias-medicas' : '/medical-negligence'}` 
+                href: `/${locale}${isSpanish ? '/negligencias-medicas' : '/medical-negligence'}` 
               },
               { label: serviceTitle },
             ]}

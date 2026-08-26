@@ -11,10 +11,11 @@ import { JsonLdBreadcrumbs } from '@/components/seo/JsonLd'
 import { siteConfig } from '@/config/site'
 
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   
   return {
@@ -47,10 +48,11 @@ export async function generateMetadata({
 }
 
 export default async function NegligenciasMedicasPage({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   const tServices = await getTranslations({ locale, namespace: 'services' })
   

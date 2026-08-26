@@ -5,10 +5,11 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin'
 // GET - Obtener post por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth()
+    const { id } = await params
     const supabase = getSupabaseAdmin()
 
     const { data: post, error } = await supabase
@@ -18,7 +19,7 @@ export async function GET(
         category:post_categories(id, name, slug),
         author:team_members(id, name)
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error || !post) {
@@ -44,10 +45,11 @@ export async function GET(
 // PATCH - Actualizar post
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth()
+    const { id } = await params
     const supabase = getSupabaseAdmin()
     const body = await request.json()
 
@@ -56,7 +58,7 @@ export async function PATCH(
       const { data: existing } = await supabase
         .from('posts')
         .select('published_at')
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
       if (!existing?.published_at) {
@@ -73,7 +75,7 @@ export async function PATCH(
     const { data: post, error } = await supabase
       .from('posts')
       .update(body)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -95,16 +97,17 @@ export async function PATCH(
 // DELETE - Eliminar post
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth()
+    const { id } = await params
     const supabase = getSupabaseAdmin()
 
     const { error } = await supabase
       .from('posts')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) throw error
 

@@ -28,10 +28,11 @@ const categoryTranslations: Record<string, string> = {
 
 // Metadata
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'blog' })
   const isSpanish = locale === 'es'
   const pageUrl = `${siteConfig.url}/${locale}/publicaciones`
@@ -141,10 +142,11 @@ async function getCategories(locale: string) {
 
 // Componente de la página
 export default async function PublicacionesPage({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const posts = await getPosts(locale)
   const categories = await getCategories(locale)
   const t = await getTranslations({ locale, namespace: 'blog' })

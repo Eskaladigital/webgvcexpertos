@@ -6,10 +6,11 @@ import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { CtaFinal } from '@/components/home'
 
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   
   return {
@@ -53,11 +54,12 @@ const teamBiosEn: Record<string, string> = {
     'Executive Secretary. Graduate from the Instituto Politécnico F.P. of Albacete in 1996. Manages the administrative coordination of files and ensures personalized attention to each client.',
 }
 
-export default function EquipoPage({
-  params: { locale }
+export default async function EquipoPage({
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   const teamBios = isSpanish ? teamBiosEs : teamBiosEn
   

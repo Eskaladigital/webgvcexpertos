@@ -5,10 +5,11 @@ import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { JsonLdContactPage, JsonLdBreadcrumbs } from '@/components/seo/JsonLd'
 
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   
   const title = isSpanish
@@ -41,10 +42,11 @@ export async function generateMetadata({
 }
 
 export default async function ContactoPage({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   
   // Mailto con asunto predefinido

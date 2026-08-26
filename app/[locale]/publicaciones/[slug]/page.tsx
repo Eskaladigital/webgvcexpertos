@@ -115,12 +115,13 @@ async function getRelatedPosts(categoryId: string, currentId: string, locale: st
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string; locale: string }
+  params: Promise<{ slug: string; locale: string }>
 }): Promise<Metadata> {
-  const post = await getPost(params.slug, params.locale)
-  const t = await getTranslations({ locale: params.locale, namespace: 'blog' })
-  const isSpanish = params.locale === 'es'
-  const pageUrl = `${siteConfig.url}/${params.locale}/publicaciones/${params.slug}`
+  const { slug, locale } = await params
+  const post = await getPost(slug, locale)
+  const t = await getTranslations({ locale, namespace: 'blog' })
+  const isSpanish = locale === 'es'
+  const pageUrl = `${siteConfig.url}/${locale}/publicaciones/${slug}`
 
   if (!post) return { title: t('metaTitle') }
 
@@ -130,8 +131,8 @@ export async function generateMetadata({
     alternates: {
       canonical: pageUrl,
       languages: {
-        'es-ES': `${siteConfig.url}/es/publicaciones/${params.slug}`,
-        'en-US': `${siteConfig.url}/en/publicaciones/${params.slug}`,
+        'es-ES': `${siteConfig.url}/es/publicaciones/${slug}`,
+        'en-US': `${siteConfig.url}/en/publicaciones/${slug}`,
       },
     },
     openGraph: {
@@ -167,18 +168,19 @@ export async function generateMetadata({
 export default async function ArticlePage({
   params,
 }: {
-  params: { slug: string; locale: string }
+  params: Promise<{ slug: string; locale: string }>
 }) {
-  const post = await getPost(params.slug, params.locale)
-  const t = await getTranslations({ locale: params.locale, namespace: 'blog' })
+  const { slug, locale } = await params
+  const post = await getPost(slug, locale)
+  const t = await getTranslations({ locale, namespace: 'blog' })
 
   if (!post) notFound()
 
   const relatedPosts = post.category?.id 
-    ? await getRelatedPosts(post.category.id, post.id, params.locale) 
+    ? await getRelatedPosts(post.category.id, post.id, locale) 
     : []
 
-  const shareUrl = `${siteConfig.url}/${params.locale}/publicaciones/${post.slug}`
+  const shareUrl = `${siteConfig.url}/${locale}/publicaciones/${post.slug}`
 
   return (
     <>
@@ -214,7 +216,7 @@ export default async function ArticlePage({
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               {new Date(post.published_at).toLocaleDateString(
-                params.locale === 'es' ? 'es-ES' : 'en-US',
+                locale === 'es' ? 'es-ES' : 'en-US',
                 { day: 'numeric', month: 'long', year: 'numeric' }
               )}
             </div>

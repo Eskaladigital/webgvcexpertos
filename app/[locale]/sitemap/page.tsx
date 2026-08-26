@@ -11,10 +11,11 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'sitemap' })
   const isSpanish = locale === 'es'
   
@@ -30,10 +31,11 @@ export async function generateMetadata({
 }
 
 export default async function SitemapPage({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'sitemap' })
   const tNav = await getTranslations({ locale, namespace: 'nav' })
   const tServices = await getTranslations({ locale, namespace: 'services' })

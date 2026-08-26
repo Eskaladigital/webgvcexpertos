@@ -6,10 +6,11 @@ import { JsonLdFAQ } from '@/components/seo/JsonLd'
 import { siteConfig } from '@/config/site'
 
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   
   return {
@@ -227,11 +228,12 @@ const faqCategoriesEn = [
   },
 ]
 
-export default function PreguntasFrecuentesPage({
-  params: { locale }
+export default async function PreguntasFrecuentesPage({
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   const faqCategories = isSpanish ? faqCategoriesEs : faqCategoriesEn
   

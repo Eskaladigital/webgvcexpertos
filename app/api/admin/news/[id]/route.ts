@@ -5,16 +5,17 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin'
 // GET - Obtener noticia por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth()
+    const { id } = await params
     const supabase = getSupabaseAdmin()
 
     const { data: newsItem, error } = await supabase
       .from('news')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error || !newsItem) {
@@ -40,17 +41,18 @@ export async function GET(
 // PATCH - Actualizar noticia
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth()
+    const { id } = await params
     const supabase = getSupabaseAdmin()
     const body = await request.json()
 
     const { data: newsItem, error } = await supabase
       .from('news')
       .update(body)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -72,16 +74,17 @@ export async function PATCH(
 // DELETE - Eliminar noticia
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth()
+    const { id } = await params
     const supabase = getSupabaseAdmin()
 
     const { error } = await supabase
       .from('news')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) throw error
 

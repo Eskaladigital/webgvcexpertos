@@ -5,17 +5,18 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin'
 // PATCH - Actualizar contacto
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth()
+    const { id } = await params
     const supabase = getSupabaseAdmin()
     const body = await request.json()
 
     const { data: contact, error } = await supabase
       .from('contact_submissions')
       .update(body)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -37,16 +38,17 @@ export async function PATCH(
 // DELETE - Eliminar contacto
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth()
+    const { id } = await params
     const supabase = getSupabaseAdmin()
 
     const { error } = await supabase
       .from('contact_submissions')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) throw error
 

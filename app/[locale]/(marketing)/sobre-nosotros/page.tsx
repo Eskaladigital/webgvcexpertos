@@ -5,10 +5,11 @@ import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { CtaFinal } from '@/components/home'
 
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   
   return {
@@ -70,11 +71,12 @@ const valuesEn = [
   },
 ]
 
-export default function SobreNosotrosPage({
-  params: { locale }
+export default async function SobreNosotrosPage({
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const isSpanish = locale === 'es'
   const values = isSpanish ? valuesEs : valuesEn
   

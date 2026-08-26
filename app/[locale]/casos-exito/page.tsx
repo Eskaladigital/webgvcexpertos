@@ -19,10 +19,11 @@ function getSupabase() {
 }
 
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'cases' })
   
   return {
@@ -68,10 +69,11 @@ function formatCurrency(amount: number): string {
 }
 
 export default async function CasosExitoPage({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const cases = await getCases()
   const t = await getTranslations({ locale, namespace: 'cases' })
   const isSpanish = locale === 'es'

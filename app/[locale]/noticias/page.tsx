@@ -20,10 +20,11 @@ function getSupabase() {
 }
 
 export async function generateMetadata({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'news' })
   
   return {
@@ -84,10 +85,11 @@ async function getNews(locale: string) {
 }
 
 export default async function NoticiasPage({
-  params: { locale }
+  params
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const news = await getNews(locale)
   const t = await getTranslations({ locale, namespace: 'news' })
 
