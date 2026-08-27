@@ -85,15 +85,19 @@ export async function POST(request: NextRequest) {
           phone: validatedData.phone,
           service: serviceName,
           message: validatedData.message,
+          contactType: validatedData.contact_type,
+          company: validatedData.company,
+          referralSource: validatedData.referral_source,
         }),
         replyTo: validatedData.email,
       })
 
       await sendEmail({
         to: validatedData.email,
-        subject: 'Hemos recibido tu consulta - GVC Expertos',
+        subject: 'Hemos recibido tu consulta — GVC Expertos',
         html: getContactConfirmationTemplate({
           name: validatedData.name,
+          message: validatedData.message,
         }),
       })
     } catch (mailError) {
