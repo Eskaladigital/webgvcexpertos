@@ -155,10 +155,26 @@
     }
   },
   "cookie": {
-    "message": "Utilizamos cookies propias y de terceros para mejorar nuestros servicios y mostrarle publicidad relacionada con sus preferencias.",
-    "moreInfo": "Más información",
+    "bannerLabel": "Banner de consentimiento de cookies",
+    "title": "Utilizamos cookies",
+    "message": "Usamos cookies propias y de terceros para mejorar nuestros servicios. Puedes aceptar todas o configurar tus preferencias.",
+    "moreInfo": "Política de cookies",
+    "moreInfoPrefix": "Más información en la",
     "accept": "Aceptar",
-    "reject": "Rechazar"
+    "acceptAll": "Aceptar todas",
+    "reject": "Rechazar",
+    "rejectAll": "Rechazar todas",
+    "configure": "Configurar",
+    "configureFooter": "Configurar cookies",
+    "settingsTitle": "Configuración de cookies",
+    "settingsIntro": "Elige qué tipos de cookies deseas aceptar. Las cookies necesarias no se pueden desactivar.",
+    "necessary": "Cookies necesarias",
+    "necessaryDesc": "Esenciales para el funcionamiento del sitio y recordar tu consentimiento.",
+    "analytics": "Cookies analíticas",
+    "analyticsDesc": "Nos permiten medir visitas y mejorar el sitio (Google Analytics).",
+    "alwaysOn": "Siempre activas",
+    "save": "Guardar preferencias",
+    "close": "Cerrar"
   },
   "footer": {
     "description": "Bufete de abogados con trayectoria desde 1946. Despacho multidisciplinar especializado en negligencias médicas, al servicio del paciente.",

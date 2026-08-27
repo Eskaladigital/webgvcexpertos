@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { siteConfig } from '@/config/site'
+import { CookieSettingsButton } from '@/components/ui/CookieBanner'
 
 export async function generateMetadata({
   params
@@ -98,6 +99,13 @@ export default async function PoliticaCookiesPage({
                 </ul>
 
                 <h2>Gestión de cookies</h2>
+                <p>
+                  Puedes modificar tu consentimiento en cualquier momento desde el pie
+                  de página o con este botón:
+                </p>
+                <p>
+                  <CookieSettingsButton className="inline-flex items-center px-5 py-3 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-dark" />
+                </p>
                 <p>
                   Puedes gestionar las cookies a través de la configuración de tu
                   navegador. A continuación, te indicamos cómo hacerlo en los
@@ -204,6 +212,13 @@ export default async function PoliticaCookiesPage({
                 </ul>
 
                 <h2>Cookie management</h2>
+                <p>
+                  You can change your consent at any time from the footer or with this
+                  button:
+                </p>
+                <p>
+                  <CookieSettingsButton className="inline-flex items-center px-5 py-3 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-dark" />
+                </p>
                 <p>
                   You can manage cookies through your browser settings. Below, we
                   explain how to do it in the most common browsers:

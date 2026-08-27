@@ -7,6 +7,7 @@ import { LocalizedLink } from '@/components/ui/LocalizedLink'
 import { useTranslations, useLocale } from 'next-intl'
 import { getTranslatedRoute, getTranslatedServiceRoute, routes } from '@/lib/routes'
 import { getLocalizedPath } from '@/lib/i18n-utils'
+import { CookieSettingsButton } from '@/components/ui/CookieBanner'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -192,6 +193,7 @@ export function Footer() {
                   {link.label}
                 </LocalizedLink>
               ))}
+              <CookieSettingsButton className="text-gray-500 hover:text-white text-sm transition-colors bg-transparent p-0 border-0 cursor-pointer" />
             </div>
           </div>
         </div>
