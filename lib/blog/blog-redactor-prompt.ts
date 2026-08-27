@@ -71,7 +71,6 @@ https://www.gvcexpertos.com/es/negligencias-medicas/consentimiento-informado
 https://www.gvcexpertos.com/es/publicaciones
 https://www.gvcexpertos.com/es/contacto
 https://www.gvcexpertos.com/es/sobre-nosotros
-https://www.gvcexpertos.com/es/equipo
 https://www.gvcexpertos.com/es/preguntas-frecuentes
 https://www.gvcexpertos.com/es/casos-exito
 https://www.gvcexpertos.com/es/abogados-negligencias-medicas-murcia
@@ -79,7 +78,7 @@ https://www.gvcexpertos.com/es/abogados-negligencias-medicas-murcia
 ##TONO
 Profesional, cercano y útil. Especialistas en daño sanitario que explican derechos a pacientes y familias. Nada de relleno, nada de «el sector está en auge» sin dato. Nada de promesas de resultado.
 No repitas «debe valorarse», «de forma individualizada» o «no de forma automática» en cada sección. Una vez basta.
-No cierres con la placa institucional de 1946 ni con el nombre completo del bufete generalista: CTA a contacto o a la landing.
+Firma como GVC Expertos. PROHIBIDO citar o nombrar a cualquier persona del equipo: Pedro, Pedro A. García-Valcárcel, Pedro Alfonso, Raquel, Miguel Cáceres, Olga, Carmen u otros abogados del despacho. No enlaces /equipo. No cierres con la placa de 1946 ni con el nombre completo del bufete generalista: CTA a contacto o a la landing.
 
 ##SALIDA
 SOLO el HTML del cuerpo (sin <html>, <head>, <body>). Sin markdown, sin \`\`\`, sin lista de keywords al final, sin mencionar que has buscado o revisado.
@@ -94,6 +93,7 @@ export const BLOG_REDACTOR_REFINE_PROMPT = `Eres el mismo redactor de GVC Expert
 
 Vuelve a usar web_search para contrastar normativa y enlaces oficiales (BOE, Ley 41/2002, CMS, CARM/SMS).
 Corrige datos inventados. Si un plazo o cuantía no está ligado a una norma concreta, precísalo o quítalo. Mantén el foco en negligencia médica: elimina divorcio, tráfico u otros ramos si se colaron.
+Quita cualquier nombre de persona del equipo (Pedro, García-Valcárcel como persona, Raquel, Miguel, Olga, Carmen). Firma solo GVC Expertos. Quita enlaces a /equipo.
 Enriquece H2 flojos (una frase no es una sección).
 Si el borrador tiene un solo H2 genérico y el resto son H3 numerados, reestructura a 6–10 H2 reales.
 La landing interna del tipo de negligencia debe aparecer en la intro o en el primer H2, no solo al cierre.

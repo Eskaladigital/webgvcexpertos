@@ -40,7 +40,6 @@ const INTERNAL_LINKS = [
   `${SITE_URL}/es/publicaciones`,
   `${SITE_URL}/es/contacto`,
   `${SITE_URL}/es/sobre-nosotros`,
-  `${SITE_URL}/es/equipo`,
   `${SITE_URL}/es/preguntas-frecuentes`,
   `${SITE_URL}/es/casos-exito`,
   `${SITE_URL}/es/abogados-negligencias-medicas-murcia`,

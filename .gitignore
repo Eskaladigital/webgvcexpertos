@@ -100,3 +100,6 @@ temp/
 # Local dev
 # ========================
 .turbo
+
+# Portadas de la cola: Storage público, no el repo (las 3 de #1 ya van trackeadas)
+public/images/blog/*.webp

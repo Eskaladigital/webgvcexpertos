@@ -15,7 +15,6 @@ import { generateLegalBlogImages } from "./generate-legal-blog-images";
 
 config({ path: resolve(process.cwd(), ".env.local") });
 
-const AUTHOR = "f3d21cbd-074f-4e37-ae22-2cd0bdc9553d";
 const CAT = {
   legal: "775a342c-cebe-465a-9618-556b12aeef19",
   guias: "06577db2-9686-4868-a12e-348b8c168d10",
@@ -127,7 +126,7 @@ async function main() {
           excerpt: "Borrador de la cola editorial.",
           content: "<p>Pendiente de redacción.</p>",
           category_id: CAT[item.cat],
-          author_id: AUTHOR,
+          author_id: null,
           is_published: true,
           is_featured: false,
           published_at: publishedAt,
@@ -146,7 +145,7 @@ async function main() {
           published_at: publishedAt,
           is_published: true,
           category_id: CAT[item.cat],
-          author_id: AUTHOR,
+          author_id: null,
         })
         .eq("id", postId);
       console.log("Ya existía", postId);
