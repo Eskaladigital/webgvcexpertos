@@ -4,9 +4,10 @@ import './globals.css'
 import type { ReactNode } from 'react'
 import type { Metadata } from 'next'
 import Script from 'next/script'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
-// Google Analytics ID
-const GA_MEASUREMENT_ID = 'G-D23DZMB7SG'
+const GA_ID =
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA_ID
 
 export const metadata: Metadata = {
   icons: {
@@ -26,11 +27,12 @@ export default function RootLayout({ children }: Props) {
       <head>
         <link rel="icon" href="/images/favicon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/images/favicon.png" />
-        <Script
-          id="gtag-consent-default"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
+        {GA_ID ? (
+          <Script
+            id="gtag-consent-default"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){window.dataLayer.push(arguments);}
               window.gtag = gtag;
@@ -45,25 +47,14 @@ export default function RootLayout({ children }: Props) {
                 wait_for_update: 500
               });
             `,
-          }}
-        />
+            }}
+          />
+        ) : null}
       </head>
       <body>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}');
-          `}
-        </Script>
+        {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
         {children}
       </body>
     </html>
   )
 }
-
