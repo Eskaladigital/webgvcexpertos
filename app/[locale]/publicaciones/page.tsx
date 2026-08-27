@@ -7,10 +7,10 @@ import { createClient } from '@supabase/supabase-js'
 import { PostsGrid } from '@/components/blog/PostsGrid'
 import { publishedAtVisibleNow } from '@/lib/blog/visible-now'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 // ============================================
-// Listado: ISR 1 h. Los published_at futuros no salen.
+// Listado en vivo desde Supabase. Sin caché de hora.
 // ============================================
 
 function getSupabase() {

@@ -150,6 +150,7 @@ async function main() {
         .eq("id", postId);
       console.log("Ya existía", postId);
     }
+    if (!postId) throw new Error(`Sin id #${item.n}`);
 
     const words = countWords(existing.data?.content || "");
     if (words < 1600) {
