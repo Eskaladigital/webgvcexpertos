@@ -304,6 +304,18 @@
   @apply my-8 rounded-sm shadow-lg max-w-full h-auto;
 }
 
+.blog-content figure {
+  @apply my-10;
+}
+
+.blog-content figure img {
+  @apply my-0;
+}
+
+.blog-content figcaption {
+  @apply text-sm text-gray-500 mt-3 text-center italic;
+}
+
 .blog-content hr {
   @apply my-10 border-t-2 border-gray-200;
 }

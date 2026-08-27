@@ -59,6 +59,7 @@ export default async function SitemapPage({
         category:post_categories(slug)
       `)
       .eq('is_published', true)
+      .lte('published_at', new Date().toISOString())
       .order('published_at', { ascending: false })
       .limit(100)
 

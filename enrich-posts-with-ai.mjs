@@ -106,7 +106,7 @@ Responde SOLO con un objeto JSON válido (sin markdown, sin explicaciones):
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-5.6-terra',
       messages: [{
         role: 'system',
         content: 'Eres un experto en SEO y traducción especializado en contenido legal médico. Respondes SOLO con JSON válido, sin markdown ni explicaciones.'
@@ -114,8 +114,7 @@ Responde SOLO con un objeto JSON válido (sin markdown, sin explicaciones):
         role: 'user',
         content: prompt
       }],
-      temperature: 0.7,
-      max_tokens: 8000,
+      max_completion_tokens: 8000,
       response_format: { type: 'json_object' }
     })
 

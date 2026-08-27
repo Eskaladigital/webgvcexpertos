@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
       .from('posts')
       .select('id, slug, title, excerpt')
       .eq('is_published', true)
+      .lte('published_at', new Date().toISOString())
       .or(`title.ilike.${searchTerm},excerpt.ilike.${searchTerm},content.ilike.${searchTerm}`)
       .limit(5)
 

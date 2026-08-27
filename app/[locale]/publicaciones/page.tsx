@@ -5,9 +5,12 @@ import { siteConfig } from '@/config/site'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@supabase/supabase-js'
 import { PostsGrid } from '@/components/blog/PostsGrid'
+import { publishedAtVisibleNow } from '@/lib/blog/visible-now'
+
+export const revalidate = 3600
 
 // ============================================
-// PÁGINA ESTÁTICA - Se genera durante el build
+// Listado: ISR 1 h. Los published_at futuros no salen.
 // ============================================
 
 function getSupabase() {
@@ -86,6 +89,7 @@ async function getPosts(locale: string) {
       author:team_members(name, photo_url)
     `)
     .eq('is_published', true)
+    .lte('published_at', publishedAtVisibleNow())
     .order('published_at', { ascending: false })
 
   if (error) {

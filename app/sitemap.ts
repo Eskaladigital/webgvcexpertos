@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from('posts')
       .select('slug, updated_at, published_at')
       .eq('is_published', true)
+      .lte('published_at', now.toISOString())
       .order('published_at', { ascending: false })
 
     if (postsData) {

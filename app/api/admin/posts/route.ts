@@ -7,7 +7,7 @@ const postSchema = z.object({
   title: z.string().min(1, 'Título requerido'),
   slug: z.string().min(1, 'Slug requerido'),
   excerpt: z.string().optional(),
-  content: z.string().min(1, 'Contenido requerido'),
+  content: z.string().optional().default('<p></p>'),
   category_id: z.string().optional().nullable(),
   featured_image: z.string().optional(),
   meta_title: z.string().optional(),

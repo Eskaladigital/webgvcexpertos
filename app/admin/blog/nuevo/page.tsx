@@ -79,7 +79,6 @@ export default function NuevoPostPage() {
     const newErrors: Record<string, string> = {}
     if (!formData.title.trim()) newErrors.title = 'El título es obligatorio'
     if (!formData.slug.trim()) newErrors.slug = 'El slug es obligatorio'
-    if (!formData.content.trim()) newErrors.content = 'El contenido es obligatorio'
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -101,7 +100,7 @@ export default function NuevoPostPage() {
       const data = await response.json()
 
       if (data.success) {
-        router.push('/admin/blog')
+        router.push(data.post?.id ? `/admin/blog/${data.post.id}` : '/admin/blog')
       } else {
         setErrors({ submit: data.message || 'Error al guardar' })
       }
@@ -125,7 +124,7 @@ export default function NuevoPostPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-charcoal">Nuevo Artículo</h1>
-            <p className="text-gray-600 text-sm">Crea un nuevo post para el blog</p>
+            <p className="text-gray-600 text-sm">Crea un nuevo post para el blog. Guarda un borrador con título y luego Redactar con IA en la ficha de edición.</p>
           </div>
         </div>
         <div className="flex items-center gap-3">

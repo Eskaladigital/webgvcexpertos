@@ -8,9 +8,13 @@ import { siteConfig } from '@/config/site'
 import { LocalizedLink } from '@/components/ui/LocalizedLink'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@supabase/supabase-js'
+import { publishedAtVisibleNow } from '@/lib/blog/visible-now'
+
+export const revalidate = 3600
+export const dynamicParams = true
 
 // ============================================
-// PÁGINAS ESTÁTICAS - Se generan durante el build
+// Ficha: ISR 1 h. Fecha futura = 404 hasta el día D.
 // ============================================
 
 function getSupabase() {
@@ -38,6 +42,7 @@ async function getAllPosts() {
       author:team_members(name, photo_url, position, bio)
     `)
     .eq('is_published', true)
+    .lte('published_at', publishedAtVisibleNow())
 
   if (error) {
     console.error('Error fetching all posts:', error)

@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const systemPrompt = getSystemPrompt(contentType, from, to)
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-5.6-terra',
       messages: [
         {
           role: 'system',
@@ -38,8 +38,7 @@ export async function POST(request: NextRequest) {
           content,
         },
       ],
-      temperature: 0.3,
-      max_tokens: 4000,
+      max_completion_tokens: 4000,
     })
 
     const translation = completion.choices[0]?.message?.content || ''

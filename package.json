@@ -16,7 +16,9 @@
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
-    "clean": "rm -rf .next node_modules/.cache"
+    "clean": "rm -rf .next node_modules/.cache",
+    "redact:blog": "npx tsx scripts/redact-blog-article.ts",
+    "redact:cola": "npx tsx scripts/launch-editorial-cola.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.0",
