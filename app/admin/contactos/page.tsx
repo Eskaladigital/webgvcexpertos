@@ -29,6 +29,9 @@ interface Contact {
   is_contacted: boolean
   notes: string | null
   created_at: string
+  contact_type?: string | null
+  company?: string | null
+  referral_source?: string | null
 }
 
 export default function ContactosPage() {
@@ -276,6 +279,15 @@ export default function ContactosPage() {
                     <MapPin className="w-4 h-4" />
                     {selectedContact.city}
                   </p>
+                )}
+                <p className="text-sm text-gray-600">
+                  Tipo: {selectedContact.contact_type === 'professional' ? 'Profesional' : 'Particular'}
+                </p>
+                {selectedContact.company && (
+                  <p className="text-sm text-gray-600">Empresa: {selectedContact.company}</p>
+                )}
+                {selectedContact.referral_source && (
+                  <p className="text-sm text-gray-600">Origen: {selectedContact.referral_source}</p>
                 )}
                 <p className="flex items-center gap-2 text-sm text-gray-600">
                   <Calendar className="w-4 h-4" />

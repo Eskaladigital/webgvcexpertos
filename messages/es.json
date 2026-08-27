@@ -143,7 +143,18 @@
       "privacyText": "He leído y acepto la",
       "privacyLink": "política de privacidad",
       "privacyAnd": "y el tratamiento de mis datos para gestionar mi consulta.",
-      "dataProtected": "🔒 Tus datos están protegidos y tratados con total confidencialidad"
+      "dataProtected": "🔒 Tus datos están protegidos y tratados con total confidencialidad",
+      "contactType": "Tipo de consulta",
+      "particular": "Particular",
+      "professional": "Profesional",
+      "company": "Empresa",
+      "companyPlaceholder": "Nombre de la empresa o clínica",
+      "referral": "¿Cómo nos has conocido?",
+      "referralPlaceholder": "Selecciona una opción",
+      "referralGoogle": "Búsqueda en Google",
+      "referralSocial": "Redes sociales",
+      "referralKnown": "Recomendación",
+      "referralOther": "Otro"
     },
     "info": {
       "address": "Dirección",

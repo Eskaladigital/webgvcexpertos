@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { Phone, Mail, MapPin, Clock } from 'lucide-react'
-import { siteConfig } from '@/config/site'
+import { siteConfig, services } from '@/config/site'
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { JsonLdContactPage, JsonLdBreadcrumbs } from '@/components/seo/JsonLd'
+import { ContactForm } from '@/components/forms/ContactForm'
 
 export async function generateMetadata({
   params
@@ -49,12 +50,8 @@ export default async function ContactoPage({
   const { locale } = await params
   const isSpanish = locale === 'es'
   
-  // Mailto con asunto predefinido
-  const mailtoSubject = isSpanish 
-    ? 'Solicitud de información legal - Negligencia médica'
-    : 'Legal information request - Medical negligence'
-  const mailtoHref = `mailto:${siteConfig.contact.email}?subject=${encodeURIComponent(mailtoSubject)}`
-  
+  const mailtoHref = siteConfig.contact.emailHref
+
   return (
     <>
       <JsonLdContactPage />
@@ -84,7 +81,7 @@ export default async function ContactoPage({
         </div>
       </section>
 
-      {/* Contact Section - Info izquierda, Mapa derecha */}
+      {/* Contact Section - Info izquierda, formulario derecha */}
       <section className="section-padding bg-cream">
         <div className="container-custom">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -169,24 +166,35 @@ export default async function ContactoPage({
               </div>
             </div>
 
-            {/* Mapa - Derecha */}
+            {/* Formulario - Derecha */}
             <div>
               <h2 className="text-2xl font-serif font-bold text-charcoal mb-8">
-                {isSpanish ? 'Nuestra Ubicación' : 'Our Location'}
+                {isSpanish ? 'Cuéntanos tu caso' : 'Tell us about your case'}
               </h2>
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden h-[500px]">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3145.8!2d-1.1307!3d37.9838!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd6381f8d5c8c7c1%3A0x1234567890abcdef!2sPlaza%20Fuensanta%2C%203%2C%2030008%20Murcia!5e0!3m2!1ses!2ses!4v1701500000000!5m2!1ses!2ses"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title={isSpanish ? 'Ubicación GVC Expertos - Murcia' : 'GVC Expertos Location - Murcia'}
-                />
+              <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
+                <ContactForm services={services.map((s) => ({ slug: s.slug, title: s.title }))} />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-padding bg-white">
+        <div className="container-custom">
+          <h2 className="text-2xl font-serif font-bold text-charcoal mb-8">
+            {isSpanish ? 'Nuestra Ubicación' : 'Our Location'}
+          </h2>
+          <div className="bg-cream rounded-lg shadow-sm overflow-hidden h-[400px]">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3145.8!2d-1.1307!3d37.9838!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd6381f8d5c8c7c1%3A0x1234567890abcdef!2sPlaza%20Fuensanta%2C%203%2C%2030008%20Murcia!5e0!3m2!1ses!2ses!4v1701500000000!5m2!1ses!2ses"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title={isSpanish ? 'Ubicación GVC Expertos - Murcia' : 'GVC Expertos Location - Murcia'}
+            />
           </div>
         </div>
       </section>

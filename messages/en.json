@@ -143,7 +143,18 @@
       "privacyText": "I have read and accept the",
       "privacyLink": "privacy policy",
       "privacyAnd": "and the processing of my data to manage my inquiry.",
-      "dataProtected": "🔒 Your data is protected and treated with complete confidentiality"
+      "dataProtected": "🔒 Your data is protected and treated with complete confidentiality",
+      "contactType": "Inquiry type",
+      "particular": "Individual",
+      "professional": "Professional",
+      "company": "Company",
+      "companyPlaceholder": "Company or clinic name",
+      "referral": "How did you hear about us?",
+      "referralPlaceholder": "Select an option",
+      "referralGoogle": "Google search",
+      "referralSocial": "Social media",
+      "referralKnown": "Referral",
+      "referralOther": "Other"
     },
     "info": {
       "address": "Address",

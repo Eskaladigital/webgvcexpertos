@@ -141,7 +141,9 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 OPENAI_API_KEY=sk-...              # Traducciones IA
 GOOGLE_PLACES_API_KEY=...          # Hospitales
-RESEND_API_KEY=re_...              # Emails
+SMTP_HOST=ssl0.ovh.net
+SMTP_USER=contacto@gvcabogados.com
+SMTP_PASS=                          # Buzón OVH; emails del form
 AMPLIFY_WEBHOOK_URL=...            # Auto-rebuild
 WEBHOOK_SECRET=...                 # Seguridad webhook
 ```

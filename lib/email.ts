@@ -1,9 +1,37 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
+import type { Transporter } from 'nodemailer'
 
-// Inicializar Resend solo si hay API key
-const resend = process.env.RESEND_API_KEY 
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null
+let _transporter: Transporter | null = null
+let _warned = false
+
+function smtpPass() {
+  return process.env.SMTP_PASS?.trim() || process.env.SMTP_PASSWORD?.trim() || ''
+}
+
+function getTransporter(): Transporter | null {
+  if (_transporter) return _transporter
+  const host = process.env.SMTP_HOST?.trim() || 'ssl0.ovh.net'
+  const port = Number(process.env.SMTP_PORT) || 465
+  const user = process.env.SMTP_USER?.trim()
+  const pass = smtpPass()
+  if (!user || !pass) {
+    if (!_warned) {
+      console.warn('[email] SMTP_USER / SMTP_PASS no configurados; correo omitido')
+      _warned = true
+    }
+    return null
+  }
+  _transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+  })
+  return _transporter
+}
 
 interface SendEmailOptions {
   to: string | string[]
@@ -14,29 +42,24 @@ interface SendEmailOptions {
 
 export async function sendEmail({ to, subject, html, replyTo }: SendEmailOptions) {
   try {
-    // Si no hay cliente de Resend configurado, retornar error
-    if (!resend) {
-      console.warn('Resend API key not configured. Email not sent.')
-      return { 
-        success: false, 
-        error: 'Email service not configured. Please add RESEND_API_KEY environment variable.' 
+    const transporter = getTransporter()
+    if (!transporter) {
+      return {
+        success: false,
+        error: 'SMTP no configurado. Añade SMTP_USER y SMTP_PASS (buzón OVH).',
       }
     }
 
-    const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'GVC Expertos <noreply@gvcexpertos.es>',
+    const from = process.env.SMTP_FROM?.trim() || 'GVC Expertos <contacto@gvcabogados.com>'
+    const info = await transporter.sendMail({
+      from,
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
-      reply_to: replyTo,
+      replyTo,
     })
 
-    if (error) {
-      console.error('Error enviando email:', error)
-      return { success: false, error }
-    }
-
-    return { success: true, data }
+    return { success: true, data: { id: info.messageId } }
   } catch (error) {
     console.error('Error en sendEmail:', error)
     return { success: false, error }
@@ -117,7 +140,7 @@ export function getContactConfirmationTemplate({ name }: { name: string }) {
         <p>Si tu caso es urgente, puedes llamarnos directamente al:</p>
         
         <p style="text-align: center; font-size: 24px; color: #b8860b; font-weight: bold;">
-          <a href="tel:+34900123456" style="color: #b8860b; text-decoration: none;">900 123 456</a>
+          <a href="tel:+34968241025" style="color: #b8860b; text-decoration: none;">968 241 025</a>
         </p>
         
         <p>Atentamente,<br>El equipo de GVC Expertos</p>
@@ -125,7 +148,7 @@ export function getContactConfirmationTemplate({ name }: { name: string }) {
       
       <div style="padding: 20px; background-color: #f5f5f5; text-align: center; color: #666; font-size: 12px;">
         <p>GVC Expertos - Abogados Especialistas en Negligencias Médicas</p>
-        <p>Calle Gran Vía, 28, 28013 Madrid</p>
+        <p>Plaza Fuensanta, 3 - 6ºB, 30008 Murcia</p>
       </div>
     </body>
     </html>

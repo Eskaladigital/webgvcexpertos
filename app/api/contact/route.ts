@@ -14,6 +14,11 @@ const contactSchema = z.object({
   service: z.string().optional(),
   message: z.string().min(10, 'Mensaje demasiado corto'),
   privacy: z.boolean().refine((val) => val === true, 'Debes aceptar la política de privacidad'),
+  contact_type: z.enum(['particular', 'professional']).optional(),
+  company: z.string().optional(),
+  referral_source: z.string().optional(),
+  locale: z.string().optional(),
+  gdpr_consent: z.boolean().optional(),
   source_url: z.string().optional(),
   utm_source: z.string().optional(),
   utm_medium: z.string().optional(),
@@ -43,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Guardar en Supabase
-    const { data: contact, error } = await supabase
+    const { error } = await supabase
       .from('contact_submissions')
       .insert({
         name: validatedData.name,
@@ -55,6 +60,11 @@ export async function POST(request: NextRequest) {
         utm_source: validatedData.utm_source || null,
         utm_medium: validatedData.utm_medium || null,
         utm_campaign: validatedData.utm_campaign || null,
+        contact_type: validatedData.contact_type || 'particular',
+        company: validatedData.contact_type === 'professional' ? validatedData.company || null : null,
+        referral_source: validatedData.referral_source || null,
+        locale: validatedData.locale || 'es',
+        gdpr_consent: validatedData.gdpr_consent ?? validatedData.privacy,
       })
       .select()
       .single()
@@ -64,29 +74,31 @@ export async function POST(request: NextRequest) {
       throw error
     }
 
-    // Enviar email de notificación al equipo
-    const notificationEmail = process.env.EMAIL_TO || 'info@gvcexpertos.es'
-    await sendEmail({
-      to: notificationEmail,
-      subject: `Nueva consulta de ${validatedData.name}`,
-      html: getContactNotificationTemplate({
-        name: validatedData.name,
-        email: validatedData.email,
-        phone: validatedData.phone,
-        service: serviceName,
-        message: validatedData.message,
-      }),
-      replyTo: validatedData.email,
-    })
+    try {
+      const notificationEmail = process.env.SMTP_TO || process.env.EMAIL_TO || 'contacto@gvcabogados.com'
+      await sendEmail({
+        to: notificationEmail,
+        subject: `Nueva consulta de ${validatedData.name}`,
+        html: getContactNotificationTemplate({
+          name: validatedData.name,
+          email: validatedData.email,
+          phone: validatedData.phone,
+          service: serviceName,
+          message: validatedData.message,
+        }),
+        replyTo: validatedData.email,
+      })
 
-    // Enviar email de confirmación al usuario
-    await sendEmail({
-      to: validatedData.email,
-      subject: 'Hemos recibido tu consulta - GVC Expertos',
-      html: getContactConfirmationTemplate({
-        name: validatedData.name,
-      }),
-    })
+      await sendEmail({
+        to: validatedData.email,
+        subject: 'Hemos recibido tu consulta - GVC Expertos',
+        html: getContactConfirmationTemplate({
+          name: validatedData.name,
+        }),
+      })
+    } catch (mailError) {
+      console.error('Contact email error:', mailError)
+    }
 
     return NextResponse.json({
       success: true,

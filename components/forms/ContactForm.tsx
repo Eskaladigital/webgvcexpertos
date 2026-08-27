@@ -1,13 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { Loader2, CheckCircle } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { LocalizedLink } from '@/components/ui/LocalizedLink'
 
 interface ContactFormProps {
@@ -16,11 +15,11 @@ interface ContactFormProps {
 
 export function ContactForm({ services }: ContactFormProps) {
   const t = useTranslations('contact.form')
-  const tCommon = useTranslations('common')
   const tServices = useTranslations('services')
-  const tLegal = useTranslations('footer')
+  const locale = useLocale()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [contactType, setContactType] = useState('particular')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,9 +35,13 @@ export function ContactForm({ services }: ContactFormProps) {
       service: formData.get('service') as string,
       message: formData.get('message') as string,
       privacy: formData.get('privacy') === 'on',
+      contact_type: (formData.get('contact_type') as string) || 'particular',
+      company: formData.get('company') as string,
+      referral_source: formData.get('referral_source') as string,
+      locale,
+      source_url: typeof window !== 'undefined' ? window.location.href : undefined,
     }
 
-    // Validación básica
     const newErrors: Record<string, string> = {}
     if (!data.name) newErrors.name = t('nameRequired')
     if (!data.email) newErrors.email = t('emailRequired')
@@ -53,10 +56,20 @@ export function ContactForm({ services }: ContactFormProps) {
     }
 
     try {
-      // Simular envío (reemplazar con llamada real a /api/contact)
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          gdpr_consent: data.privacy,
+        }),
+      })
+      if (!res.ok) {
+        setErrors({ submit: t('error') })
+        return
+      }
       setIsSuccess(true)
-    } catch (error) {
+    } catch {
       setErrors({ submit: t('error') })
     } finally {
       setIsSubmitting(false)
@@ -73,7 +86,7 @@ export function ContactForm({ services }: ContactFormProps) {
         <p className="text-gray-600 mb-6">
           {t('successMessage')}
         </p>
-        <Button variant="outline" onClick={() => setIsSuccess(false)}>
+        <Button variant="outline" onClick={() => { setIsSuccess(false); setContactType('particular') }}>
           {t('sendAnother')}
         </Button>
       </div>
@@ -82,6 +95,25 @@ export function ContactForm({ services }: ContactFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <Select
+        name="contact_type"
+        label={t('contactType')}
+        defaultValue="particular"
+        onChange={(e) => setContactType(e.target.value)}
+        options={[
+          { value: 'particular', label: t('particular') },
+          { value: 'professional', label: t('professional') },
+        ]}
+      />
+
+      {contactType === 'professional' && (
+        <Input
+          name="company"
+          label={t('company')}
+          placeholder={t('companyPlaceholder')}
+        />
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
           name="name"
@@ -113,7 +145,6 @@ export function ContactForm({ services }: ContactFormProps) {
           options={[
             { value: '', label: t('selectService') },
             ...services.map((s) => {
-              // Mapear slug a traducción
               const serviceSlugMap: Record<string, string> = {
                 'errores-quirurgicos': 'surgical-errors',
                 'errores-diagnostico': 'diagnostic-errors',
@@ -129,6 +160,19 @@ export function ContactForm({ services }: ContactFormProps) {
           ]}
         />
       </div>
+
+      <Select
+        name="referral_source"
+        label={t('referral')}
+        placeholder={t('referralPlaceholder')}
+        options={[
+          { value: '', label: t('referralPlaceholder') },
+          { value: 'google', label: t('referralGoogle') },
+          { value: 'social', label: t('referralSocial') },
+          { value: 'referral', label: t('referralKnown') },
+          { value: 'other', label: t('referralOther') },
+        ]}
+      />
 
       <Textarea
         name="message"
