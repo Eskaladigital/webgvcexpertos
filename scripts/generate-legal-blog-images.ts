@@ -19,49 +19,50 @@ const IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL?.trim() || "gpt-image-2";
 const SIZE = "1536x1024" as const;
 
 const LEGAL_TAIL =
-  "Fotografía editorial hiperrealista, luz natural suave, tono serio y profesional. Sin texto, logos, marcas, watermarks ni letras legibles. Sin caras reconocibles, sin pacientes identificables, sin sangre, sin heridas, sin quirófano cruento. No estilo ilustración ni IA evidente.";
+  "Fotografía editorial hiperrealista, luz natural suave, tono serio y profesional. Debe verse al menos una cara humana (abogado, paciente o familiar), aspecto mediterráneo, 35-65 años. No copies a nadie famoso ni al equipo de un bufete concreto. Sin texto, logos, marcas ni letras. Sin sangre, heridas ni quirófano cruento. No ilustración.";
+
+function peopleCover(title: string): string {
+  const t = title.toLowerCase();
+  const n = [...title].reduce((a, c) => a + c.charCodeAt(0), 0) % 4;
+  if (/parto|obstétr|cesárea|epidural|fetal|plexo|hemorragia/.test(t)) {
+    return n % 2 === 0
+      ? "Portada: abogada de unos 40 años con blazer oscuro escucha a una madre joven en un despacho, cara de ambas visible, carpeta en la mesa, luz de tarde."
+      : "Portada: pareja de 30 años sentada frente a un abogado de 50 en consulta, caras visibles, ambiente de despacho murciano, sin texto.";
+  }
+  if (/quirúrg|cirugía|gasa|instrumento|lado equivocado|columna|prótesis|cataratas|colonoscop|robótica/.test(t)) {
+    return n % 2 === 0
+      ? "Portada: cirujano de 45 años de espaldas parcial y un familiar escuchando en un despacho hospitalario, caras visibles, tono grave, sin sangre."
+      : "Portada: cliente hombre de 55 años y abogada de 40 revisan un informe sobre la mesa, caras visibles, despacho jurídico-sanitario.";
+  }
+  if (/urgencia|ictus|infarto|sepsis|ambulancia|alta hospitalaria/.test(t)) {
+    return "Portada: mujer de 50 años preocupada en sala de espera de urgencias y un abogado de traje acercándose a hablarle, caras visibles, hospital español.";
+  }
+  if (/historia clínica|perito|plazo|patrimonial|mutua|indemniz|secuela/.test(t)) {
+    return n % 2 === 0
+      ? "Portada: abogado de 55 años con traje oscuro explica un expediente a un cliente de 60, ambas caras visibles, despacho en Murcia, luz de ventana."
+      : "Portada: clienta de 45 años frente a una abogada, conversación seria, caras visibles, estantería de libros jurídicos al fondo.";
+  }
+  if (/cáncer|quimio|radioterapia|diálisis|trasplante|meningitis|apendicitis/.test(t)) {
+    return "Portada: paciente de 50 años y su pareja escuchan a una abogada en consulta, tres caras visibles, ambiente cálido de despacho, no hospital de día vacío.";
+  }
+  if (/psiquiatría|contención|residencia|mayor/.test(t)) {
+    return "Portada: abogada habla con un adulto mayor y su hija en un despacho, caras visibles, tono cercano y serio.";
+  }
+  const covers = [
+    "Portada: abogado de 50 años de traje escucha a una clienta de 40 frente a frente, caras visibles, mesa de despacho, Murcia, luz natural.",
+    "Portada: abogada de 38 años con blazer y un cliente mayor revisan papeles, ambas caras visibles, no recortes de manos solas.",
+    "Portada: pareja en consulta con un abogado, tres personas, caras visibles, ambiente jurídico-sanitario profesional.",
+    "Portada: primer plano de un abogado hablando con un paciente en silla de ruedas en un pasillo de hospital, caras visibles, tono documental.",
+  ];
+  return covers[n];
+}
 
 function promptsForTitle(title: string): [string, string, string] {
-  const t = title.toLowerCase();
-  let cover =
-    "Portada horizontal: mesa de despacho jurídico-sanitario en Murcia, carpeta clínica cerrada, bolígrafo, luz de tarde, fondo de consulta vacía desenfocado.";
-  let body1 =
-    "Primer plano de manos de un adulto sobre una carpeta clínica y un documento con texto ilegible, ambiente de consulta española, sin rostro.";
-  let body2 =
-    "Sala de espera o pasillo de hospital público español vacío, sillas, cartelera desenfocada sin texto legible, atmósfera calmada y documental.";
-
-  if (/parto|obstétr|cesárea|epidural|fetal|plexo|hemorragia/.test(t)) {
-    cover =
-      "Portada: habitación de maternidad vacía y en calma, cuna y monitor apagado desenfocado, luz suave de mañana, sin personas.";
-    body1 = "Manos de un adulto sujetando un informe clínico sobre una mesa, anillo discreto, luz de consulta, sin rostro.";
-    body2 = "Pasillo de planta de maternidad vacío, puertas cerradas, suelo brillante, ambiente hospitalario español.";
-  } else if (/quirúrg|cirugía|gasa|instrumento|lado equivocado|columna|prótesis|cataratas|colonoscop|robótica/.test(t)) {
-    cover =
-      "Portada: quirófano vacío y ordenado después de una intervención, lámpara apagada, paños limpios, sin personas ni sangre.";
-    body1 = "Bandeja de instrumental quirúrgico cerrado y limpio sobre paño verde, luz fría, sin personas.";
-    body2 = "Pasillo de bloque quirúrgico vacío, puertas automáticas, ambiente hospitalario español, sin texto legible.";
-  } else if (/urgencia|ictus|infarto|sepsis|ambulancia|alta hospitalaria/.test(t)) {
-    cover =
-      "Portada: entrada de urgencias de hospital público español de noche, rotulo desenfocado, ambulancia lejana, sin personas identificables.";
-    body1 = "Silla de ruedas vacía junto a un mostrador de admisión, luz fluorescente suave, sin caras.";
-    body2 = "Sala de espera de urgencias vacía a deshora, sillas, reloj de pared desenfocado, atmósfera tensa y documental.";
-  } else if (/historia clínica|perito|plazo|patrimonial|mutua|indemniz|secuela/.test(t)) {
-    cover =
-      "Portada: despacho jurídico con expediente sanitario cerrado, sello y gafas, luz de tarde, Murcia, sin texto legible.";
-    body1 = "Manos de un adulto pasando páginas de una historia clínica encuadernada, texto ilegible, sin rostro.";
-    body2 = "Archivo de historiales en estantería metálica de un centro sanitario, ambiente documental.";
-  } else if (/cáncer|quimio|radioterapia|diálisis|trasplante|meningitis|apendicitis/.test(t)) {
-    cover =
-      "Portada: consulta oncológica o de hospital de día vacía, sillón de tratamiento vacío, luz natural, sin personas.";
-    body1 = "Manos sosteniendo un informe de pruebas sobre una mesa clara, sin rostro ni texto legible.";
-    body2 = "Pasillo de hospital de día vacío, butacas, planta, ambiente sereno.";
-  } else if (/psiquiatría|contención|residencia|mayor/.test(t)) {
-    cover =
-      "Portada: sala común de residencia o planta de psiquiatría vacía, sillones, luz de tarde, ambiente contenido.";
-    body1 = "Manos de un adulto mayor sobre una manta y un documento clínico, sin rostro.";
-    body2 = "Pasillo de residencia o planta hospitalaria vacía, barandilla, luz cálida.";
-  }
-
+  const cover = peopleCover(title);
+  const body1 =
+    "Consulta en un despacho: abogado y cliente sentados, caras visibles, carpeta clínica en la mesa, texto ilegible, luz suave.";
+  const body2 =
+    "Sala de espera de hospital con dos o tres personas sentadas, caras visibles, atmósfera calmada, sin cartelera legible.";
   return [cover, body1, body2];
 }
 
@@ -92,7 +93,7 @@ async function generateWebp(openai: OpenAI, prompt: string) {
   return sharp(Buffer.from(b64, "base64")).webp({ quality: 82 }).toBuffer();
 }
 
-export async function generateLegalBlogImages(postId: string) {
+export async function generateLegalBlogImages(postId: string, opts: { coverOnly?: boolean } = {}) {
   if (!process.env.OPENAI_API_KEY) throw new Error("Falta OPENAI_API_KEY");
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -113,11 +114,13 @@ export async function generateLegalBlogImages(postId: string) {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const base = post.slug as string;
   const [coverPrompt, fig1Prompt, fig2Prompt] = promptsForTitle(post.title as string);
-  const jobs = [
-    { file: `${base}-portada.webp`, prompt: coverPrompt },
-    { file: `${base}-cuerpo-1.webp`, prompt: fig1Prompt },
-    { file: `${base}-cuerpo-2.webp`, prompt: fig2Prompt },
-  ];
+  const jobs = opts.coverOnly
+    ? [{ file: `${base}-portada.webp`, prompt: coverPrompt }]
+    : [
+        { file: `${base}-portada.webp`, prompt: coverPrompt },
+        { file: `${base}-cuerpo-1.webp`, prompt: fig1Prompt },
+        { file: `${base}-cuerpo-2.webp`, prompt: fig2Prompt },
+      ];
 
   const publicUrls: string[] = [];
   for (const job of jobs) {
@@ -133,29 +136,32 @@ export async function generateLegalBlogImages(postId: string) {
     console.log("  ", webp.length, "bytes");
   }
 
-  const fig1 = figureHtml(
-    publicUrls[1],
-    "Documentación clínica sobre una mesa de consulta",
-    "La prueba suele empezar por la historia clínica completa, no solo por un documento suelto."
-  );
-  const fig2 = figureHtml(
-    publicUrls[2],
-    "Pasillo o sala de espera de un centro sanitario",
-    "La vía de reclamación cambia si la asistencia fue pública o privada."
-  );
+  const payload: Record<string, unknown> = {
+    featured_image: `${publicUrls[0]}?v=2`,
+    updated_at: new Date().toISOString(),
+  };
 
-  let html = post.content as string;
-  html = html.replace(/<figure>[\s\S]*?<\/figure>/gi, "");
-  html = insertAfterNthH2(html, 3, fig1);
-  html = insertAfterNthH2(html, 5, fig2);
+  if (!opts.coverOnly && publicUrls[1] && publicUrls[2]) {
+    const fig1 = figureHtml(
+      publicUrls[1],
+      "Abogado y cliente revisan documentación clínica en consulta",
+      "La prueba suele empezar por la historia clínica completa, no solo por un documento suelto."
+    );
+    const fig2 = figureHtml(
+      publicUrls[2],
+      "Personas en la sala de espera de un centro sanitario",
+      "La vía de reclamación cambia si la asistencia fue pública o privada."
+    );
+    let html = post.content as string;
+    html = html.replace(/<figure>[\s\S]*?<\/figure>/gi, "");
+    html = insertAfterNthH2(html, 3, fig1);
+    html = insertAfterNthH2(html, 5, fig2);
+    payload.content = html;
+  }
 
   const { error: saveErr } = await supabase
     .from("posts")
-    .update({
-      featured_image: publicUrls[0],
-      content: html,
-      updated_at: new Date().toISOString(),
-    })
+    .update(payload)
     .eq("id", postId);
   if (saveErr) throw new Error(saveErr.message);
 
@@ -164,7 +170,7 @@ export async function generateLegalBlogImages(postId: string) {
 
 async function main() {
   if (!POST_ID) throw new Error("Indica --post-id=UUID");
-  await generateLegalBlogImages(POST_ID);
+  await generateLegalBlogImages(POST_ID, { coverOnly: process.argv.includes("--cover-only") });
 }
 
 const invokedDirectly = process.argv[1]?.includes("generate-legal-blog-images");
