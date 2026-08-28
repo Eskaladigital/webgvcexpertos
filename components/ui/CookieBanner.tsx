@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Cookie, X, ShieldCheck, BarChart3 } from 'lucide-react'
+import { Cookie, X, ShieldCheck, BarChart3, Settings, Megaphone } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { LocalizedLink } from './LocalizedLink'
 
@@ -12,19 +12,22 @@ const PREFS_KEY = 'cookie_preferences'
 type Prefs = {
   necessary: true
   analytics: boolean
+  functional: boolean
+  marketing: boolean
 }
 
-const ALL_ON: Prefs = { necessary: true, analytics: true }
-const ONLY_NECESSARY: Prefs = { necessary: true, analytics: false }
+const ALL_ON: Prefs = { necessary: true, analytics: true, functional: true, marketing: true }
+const ONLY_NECESSARY: Prefs = { necessary: true, analytics: false, functional: false, marketing: false }
 
 function updateGtag(prefs: Prefs) {
   if (typeof window === 'undefined' || !(window as any).gtag) return
-  const v = prefs.analytics ? 'granted' : 'denied'
+  const analytics = prefs.analytics ? 'granted' : 'denied'
+  const ads = prefs.marketing ? 'granted' : 'denied'
   ;(window as any).gtag('consent', 'update', {
-    analytics_storage: v,
-    ad_storage: 'denied',
-    ad_user_data: 'denied',
-    ad_personalization: 'denied',
+    analytics_storage: analytics,
+    ad_storage: ads,
+    ad_user_data: ads,
+    ad_personalization: ads,
   })
 }
 
@@ -39,7 +42,12 @@ function readPrefs(): Prefs | null {
     const raw = localStorage.getItem(PREFS_KEY)
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<Prefs>
-      return { necessary: true, analytics: Boolean(parsed.analytics) }
+      return {
+        necessary: true,
+        analytics: Boolean(parsed.analytics),
+        functional: Boolean(parsed.functional),
+        marketing: Boolean(parsed.marketing),
+      }
     }
     const legacy = localStorage.getItem(KEY)
     if (legacy === 'accepted') return ALL_ON
@@ -125,37 +133,36 @@ export function CookieBanner() {
           </div>
           <div className="flex-1 overflow-y-auto p-6">
             <p className="text-gray-600 mb-6">{t('settingsIntro')}</p>
-            <div className="p-4 rounded-xl border-2 mb-4 border-gold bg-gold/5">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gold text-white shrink-0">
-                  <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-3 mb-1">
-                    <h3 className="font-semibold text-charcoal">{t('necessary')}</h3>
-                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">{t('alwaysOn')}</span>
-                  </div>
-                  <p className="text-sm text-gray-600">{t('necessaryDesc')}</p>
-                </div>
-              </div>
-            </div>
-            <div className={`p-4 rounded-xl border-2 mb-4 ${prefs.analytics ? 'border-gold bg-gold/5' : 'border-gray-200 bg-gray-50'}`}>
-              <div className="flex items-start gap-4">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${prefs.analytics ? 'bg-gold text-white' : 'bg-gray-200 text-gray-500'}`}>
-                  <BarChart3 className="h-5 w-5" aria-hidden="true" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-3 mb-1">
-                    <h3 className="font-semibold text-charcoal">{t('analytics')}</h3>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" checked={prefs.analytics} onChange={(e) => setPrefs((p) => ({ ...p, analytics: e.target.checked }))} aria-label={t('analytics')} />
-                      <span className="w-10 h-6 bg-gray-300 rounded-full peer-checked:bg-gold transition-colors" />
-                      <span className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
-                    </label>
-                  </div>
-                  <p className="text-sm text-gray-600">{t('analyticsDesc')}</p>
-                </div>
-              </div>
+            <div className="space-y-4">
+              <ExpertosCategory
+                icon={ShieldCheck}
+                title={t('necessary')}
+                description={t('necessaryDesc')}
+                enabled
+                required
+                alwaysOn={t('alwaysOn')}
+              />
+              <ExpertosCategory
+                icon={BarChart3}
+                title={t('analytics')}
+                description={t('analyticsDesc')}
+                enabled={prefs.analytics}
+                onChange={(v) => setPrefs((p) => ({ ...p, analytics: v }))}
+              />
+              <ExpertosCategory
+                icon={Settings}
+                title={t('functional')}
+                description={t('functionalDesc')}
+                enabled={prefs.functional}
+                onChange={(v) => setPrefs((p) => ({ ...p, functional: v }))}
+              />
+              <ExpertosCategory
+                icon={Megaphone}
+                title={t('marketing')}
+                description={t('marketingDesc')}
+                enabled={prefs.marketing}
+                onChange={(v) => setPrefs((p) => ({ ...p, marketing: v }))}
+              />
             </div>
             <p className="text-sm text-gray-500 mt-6">
               {t('moreInfoPrefix')}{' '}
@@ -199,6 +206,49 @@ export function CookieBanner() {
               {t('acceptAll')}
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ExpertosCategory({
+  icon: Icon,
+  title,
+  description,
+  enabled,
+  required,
+  alwaysOn,
+  onChange,
+}: {
+  icon: typeof ShieldCheck
+  title: string
+  description: string
+  enabled: boolean
+  required?: boolean
+  alwaysOn?: string
+  onChange?: (v: boolean) => void
+}) {
+  return (
+    <div className={`p-4 rounded-xl border-2 ${enabled ? 'border-gold bg-gold/5' : 'border-gray-200 bg-gray-50'}`}>
+      <div className="flex items-start gap-4">
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${enabled ? 'bg-gold text-white' : 'bg-gray-200 text-gray-500'}`}>
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between gap-3 mb-1">
+            <h3 className="font-semibold text-charcoal">{title}</h3>
+            {required ? (
+              <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full whitespace-nowrap">{alwaysOn}</span>
+            ) : (
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" className="sr-only peer" checked={enabled} onChange={(e) => onChange?.(e.target.checked)} aria-label={title} />
+                <span className="w-10 h-6 bg-gray-300 rounded-full peer-checked:bg-gold transition-colors" />
+                <span className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
+              </label>
+            )}
+          </div>
+          <p className="text-sm text-gray-600">{description}</p>
         </div>
       </div>
     </div>

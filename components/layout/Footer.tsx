@@ -48,14 +48,13 @@ export function Footer() {
     { label: tLegal('legalNotice'), href: routes[locale].legal.notice },
     { label: tLegal('privacy'), href: routes[locale].legal.privacy },
     { label: tLegal('cookies'), href: routes[locale].legal.cookies },
-    { label: tLegal('sitemap'), href: routes[locale].legal.sitemap },
   ]
 
   return (
     <footer className="bg-charcoal text-white">
       {/* Main Footer */}
       <div className="container-custom py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand Column */}
           <div className="lg:col-span-1">
             <LocalizedLink href="/" className="inline-block mb-6">
@@ -173,6 +172,28 @@ export function Footer() {
               </li>
             </ul>
           </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="text-lg font-serif font-semibold mb-5 text-gold">
+              Legal
+            </h4>
+            <ul className="space-y-3">
+              {footerLegal.map((link) => (
+                <li key={link.href}>
+                  <LocalizedLink
+                    href={link.href}
+                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    {link.label}
+                  </LocalizedLink>
+                </li>
+              ))}
+              <li>
+                <CookieSettingsButton className="text-gray-400 hover:text-white text-sm transition-colors bg-transparent p-0 border-0 cursor-pointer" />
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -183,19 +204,23 @@ export function Footer() {
             <p className="text-gray-500 text-sm text-center md:text-left">
               © {currentYear} {siteConfig.legal.company}. {t('copyright')}.
             </p>
-            <div className="flex flex-wrap justify-center gap-6">
-              {footerLegal.map((link) => (
-                <LocalizedLink
-                  key={link.href}
-                  href={link.href}
-                  className="text-gray-500 hover:text-white text-sm transition-colors"
-                >
-                  {link.label}
-                </LocalizedLink>
-              ))}
-              <CookieSettingsButton className="text-gray-500 hover:text-white text-sm transition-colors bg-transparent p-0 border-0 cursor-pointer" />
-            </div>
+            <LocalizedLink
+              href={routes[locale].legal.sitemap}
+              className="text-gray-500 hover:text-white text-sm transition-colors"
+            >
+              {tLegal('sitemap')}
+            </LocalizedLink>
           </div>
+          <p className="mt-4 text-center text-gray-500 text-xs leading-relaxed">
+            <span className="block sm:inline">Hecho con <span className="text-red-500 inline-block animate-pulse">❤️</span> en Murcia</span>
+            <span className="hidden sm:inline"> · </span>
+            <span className="block sm:inline mt-1 sm:mt-0">
+              Web desarrollada por{' '}
+              <a href="https://www.eskaladigital.com" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-white font-medium whitespace-nowrap">
+                ESKALA Agencia de Marketing Digital
+              </a>
+            </span>
+          </p>
         </div>
       </div>
     </footer>
