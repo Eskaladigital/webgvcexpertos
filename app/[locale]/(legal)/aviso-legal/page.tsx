@@ -140,7 +140,7 @@ export default async function AvisoLegalPage({
                   La relación entre {siteConfig.legal.company} y el usuario se regirá
                   por la normativa española vigente. Para la resolución de cualquier
                   controversia, las partes se someten a los Juzgados y Tribunales de
-                  Madrid.
+                  Murcia.
                 </p>
 
                 <p className="text-sm text-gray-500 mt-8">
@@ -232,7 +232,7 @@ export default async function AvisoLegalPage({
                   The relationship between {siteConfig.legal.company} and the user
                   will be governed by current Spanish regulations. For the resolution
                   of any controversy, the parties submit to the Courts and Tribunals
-                  of Madrid.
+                  of Murcia.
                 </p>
 
                 <p className="text-sm text-gray-500 mt-8">

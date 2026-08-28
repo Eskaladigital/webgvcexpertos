@@ -6,6 +6,12 @@ Todos los cambios notables del proyecto GVC Expertos.
 
 ---
 
+## 28 ago 2026 — SEO nacional desde Murcia
+
+Las landings de ciudad nombran **dónde ocurrió el daño**, no una sucursal. NAP y JSON-LD = Plaza Fuensanta, Murcia; `areaServed` = la ciudad + España. Titles sin marca duplicada. FAQ viva «¿Trabajáis en toda España?» ya no dice sede en Madrid. `public/robots.txt` apunta a gvcexpertos.com.
+
+---
+
 ## [2.1.0] - 2024-12-03
 
 ### 🚀 Lanzamiento en Producción

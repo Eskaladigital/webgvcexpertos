@@ -51,8 +51,10 @@ export const services = [
 ]
 
 /**
- * Ciudades para landings locales - 105 ciudades
- * Slug formato: abogados-negligencias-medicas-{ciudad}
+ * Landings de territorio (107 ciudades).
+ * La URL nombra dónde ocurrió el daño; el despacho está en Murcia y presta
+ * el servicio en todo el territorio. No son sucursales.
+ * Slug: abogados-negligencias-medicas-{ciudad}
  */
 export const cities: {
   slug: string
@@ -307,6 +309,17 @@ export const siteConfig = {
     emailHref: 'mailto:contacto@gvcabogados.com',
     address: 'Plaza Fuensanta, 3 - 6ºB, 30008 Murcia',
     schedule: 'Lun - Vie: 9:00 - 19:00',
+  },
+  /** NAP único. Las landings de ciudad no inventan oficina local. */
+  office: {
+    streetAddress: 'Plaza Fuensanta, 3 - 6ºB',
+    addressLocality: 'Murcia',
+    postalCode: '30008',
+    addressRegion: 'Región de Murcia',
+    addressCountry: 'ES',
+    latitude: 37.9922,
+    longitude: -1.1307,
+    hasMap: 'https://maps.google.com/?q=Plaza+Fuensanta+3+Murcia',
   },
   social: {
     linkedin: 'https://linkedin.com/company/gvcexpertos',

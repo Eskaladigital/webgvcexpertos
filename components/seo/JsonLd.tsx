@@ -1,5 +1,25 @@
 import { siteConfig } from '@/config/site'
 
+function postalAddressMurcia() {
+  const o = siteConfig.office
+  return {
+    '@type': 'PostalAddress' as const,
+    streetAddress: o.streetAddress,
+    addressLocality: o.addressLocality,
+    postalCode: o.postalCode,
+    addressRegion: o.addressRegion,
+    addressCountry: o.addressCountry,
+  }
+}
+
+function geoMurcia() {
+  return {
+    '@type': 'GeoCoordinates' as const,
+    latitude: siteConfig.office.latitude,
+    longitude: siteConfig.office.longitude,
+  }
+}
+
 // ============================================
 // ORGANIZATION - Para toda la web
 // ============================================
@@ -17,25 +37,12 @@ export function JsonLdOrganization() {
       height: 60,
     },
     description: siteConfig.description,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'C/ Gran Vía, 28',
-      addressLocality: 'Madrid',
-      postalCode: '28013',
-      addressCountry: 'ES',
-    },
+    address: postalAddressMurcia(),
     contactPoint: [
       {
         '@type': 'ContactPoint',
         telephone: siteConfig.contact.phone,
         contactType: 'customer service',
-        availableLanguage: ['Spanish'],
-        areaServed: 'ES',
-      },
-      {
-        '@type': 'ContactPoint',
-        telephone: siteConfig.contact.phone,
-        contactType: 'sales',
         availableLanguage: ['Spanish'],
         areaServed: 'ES',
       },
@@ -45,11 +52,7 @@ export function JsonLdOrganization() {
       siteConfig.social.twitter,
       siteConfig.social.facebook,
     ].filter(Boolean),
-    foundingDate: '2003',
-    numberOfEmployees: {
-      '@type': 'QuantitativeValue',
-      value: 15,
-    },
+    foundingDate: String(siteConfig.foundedYear),
   }
 
   return (
@@ -77,67 +80,24 @@ export function JsonLdLocalBusiness() {
     telephone: siteConfig.contact.phone,
     email: siteConfig.contact.email,
     description: siteConfig.description,
-    slogan: 'Más de 20 años defendiendo los derechos de los pacientes',
+    slogan: 'Despacho en Murcia. Negligencias médicas en todo el territorio.',
     priceRange: '€€€',
     currenciesAccepted: 'EUR',
     paymentAccepted: 'Cash, Credit Card, Bank Transfer',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'C/ Gran Vía, 28',
-      addressLocality: 'Madrid',
-      postalCode: '28013',
-      addressRegion: 'Madrid',
-      addressCountry: 'ES',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: 40.4200,
-      longitude: -3.7025,
-    },
-    hasMap: 'https://maps.google.com/?q=Gran+Via+28+Madrid',
+    address: postalAddressMurcia(),
+    geo: geoMurcia(),
+    hasMap: siteConfig.office.hasMap,
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         opens: '09:00',
-        closes: '20:00',
-      },
-    ],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      bestRating: '5',
-      worstRating: '1',
-      reviewCount: '127',
-      ratingCount: '127',
-    },
-    review: [
-      {
-        '@type': 'Review',
-        reviewRating: {
-          '@type': 'Rating',
-          ratingValue: '5',
-          bestRating: '5',
-        },
-        author: {
-          '@type': 'Person',
-          name: 'María G.',
-        },
-        reviewBody: 'Excelente equipo de profesionales. Consiguieron una indemnización justa por mi caso de negligencia médica.',
+        closes: '19:00',
       },
     ],
     areaServed: {
       '@type': 'Country',
       name: 'España',
-    },
-    serviceArea: {
-      '@type': 'GeoCircle',
-      geoMidpoint: {
-        '@type': 'GeoCoordinates',
-        latitude: 40.4168,
-        longitude: -3.7038,
-      },
-      geoRadius: '500000',
     },
     knowsAbout: [
       'Negligencias médicas',
@@ -429,53 +389,41 @@ export function JsonLdLocalBusinessCity({
   cityName,
   citySlug,
   province,
-  latitude,
-  longitude,
+  locale = 'es',
 }: {
   cityName: string
   citySlug: string
   province: string
-  latitude?: number
-  longitude?: number
+  locale?: string
 }) {
+  const pageUrl = `${siteConfig.url}/${locale}/${citySlug}`
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'LegalService',
-    '@id': `${siteConfig.url}/${citySlug}/#localbusiness`,
-    name: `${siteConfig.name} - Abogados Negligencias Médicas en ${cityName}`,
+    '@id': `${pageUrl}/#legalservice`,
+    name: siteConfig.name,
     image: `${siteConfig.url}/images/og-image.jpg`,
-    url: `${siteConfig.url}/${citySlug}`,
+    url: pageUrl,
     telephone: siteConfig.contact.phone,
     email: siteConfig.contact.email,
-    description: `Abogados especializados en negligencias médicas en ${cityName}, ${province}. Bufete con trayectoria desde 1946.`,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: cityName,
-      addressRegion: province,
-      addressCountry: 'ES',
+    description: `Negligencias médicas ocurridas en ${cityName}, ${province}. Despacho en Murcia. Servicio en todo el territorio español.`,
+    address: postalAddressMurcia(),
+    geo: geoMurcia(),
+    hasMap: siteConfig.office.hasMap,
+    parentOrganization: {
+      '@id': `${siteConfig.url}/#organization`,
     },
-    geo: latitude && longitude ? {
-      '@type': 'GeoCoordinates',
-      latitude,
-      longitude,
-    } : undefined,
-    areaServed: {
-      '@type': 'City',
-      name: cityName,
-    },
+    areaServed: [
+      {
+        '@type': 'City',
+        name: cityName,
+      },
+      {
+        '@type': 'Country',
+        name: 'España',
+      },
+    ],
     priceRange: '€€€',
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      bestRating: '5',
-      reviewCount: '127',
-    },
-    openingHoursSpecification: {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-      opens: '09:00',
-      closes: '20:00',
-    },
   }
 
   return (
@@ -588,18 +536,8 @@ export function JsonLdProfessionalService() {
     description: siteConfig.description,
     telephone: siteConfig.contact.phone,
     email: siteConfig.contact.email,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'C/ Gran Vía, 28',
-      addressLocality: 'Madrid',
-      postalCode: '28013',
-      addressCountry: 'ES',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: '40.4200',
-      longitude: '-3.7025',
-    },
+    address: postalAddressMurcia(),
+    geo: geoMurcia(),
     areaServed: 'ES',
     hasOfferCatalog: {
       '@type': 'OfferCatalog',

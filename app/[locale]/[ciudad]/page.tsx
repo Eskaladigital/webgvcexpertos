@@ -23,7 +23,6 @@ import { ServiceIcon } from '@/components/ui/Icons'
 import { CtaFinal } from '@/components/home'
 import { JsonLdLocalBusinessCity, JsonLdBreadcrumbs, JsonLdFAQ } from '@/components/seo/JsonLd'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { CITY_COORDINATES } from '@/lib/google-places'
 import { getTranslations } from 'next-intl/server'
 
 // Generar rutas estáticas para todas las ciudades y locales
@@ -51,15 +50,15 @@ export async function generateMetadata({
 
   const isSpanish = locale === 'es'
   const title = isSpanish
-    ? `Abogados Negligencias Médicas ${city.name} | ${siteConfig.name}`
-    : `Medical Negligence Lawyers ${city.name} | ${siteConfig.name}`
+    ? `Negligencias médicas en ${city.name} | GVC Expertos (Murcia)`
+    : `Medical negligence in ${city.name} | GVC Expertos (Murcia)`
   const description = isSpanish
-    ? `Abogados especializados en negligencias médicas en ${city.name}, ${city.province}. Bufete con trayectoria desde 1946. ☎ ${siteConfig.contact.phone}`
-    : `Lawyers specialized in medical negligence in ${city.name}, ${city.province}. Law firm with track record since 1946. ☎ ${siteConfig.contact.phone}`
+    ? `El daño ocurrió en ${city.name}. El despacho está en Murcia y llevamos el caso en todo el territorio. ☎ ${siteConfig.contact.phone}`
+    : `The harm occurred in ${city.name}. The firm is in Murcia and we handle the case nationwide. ☎ ${siteConfig.contact.phone}`
   const url = `${siteConfig.url}/${locale}/${city.slug}`
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: url,
@@ -120,12 +119,6 @@ async function getHospitalsForCity(cityName: string) {
   }
 }
 
-// Obtener coordenadas de la ciudad
-function getCityCoordinates(citySlug: string) {
-  const cityKey = citySlug.replace('abogados-negligencias-medicas-', '')
-  return CITY_COORDINATES[cityKey] || null
-}
-
 export default async function CiudadPage({
   params,
 }: {
@@ -138,16 +131,13 @@ export default async function CiudadPage({
     notFound()
   }
 
-  // Obtener hospitales y coordenadas
+  // Obtener hospitales de la ciudad (lugar del daño, no sucursal)
   const hospitals = await getHospitalsForCity(city.name)
-  const coords = getCityCoordinates(city.slug)
 
   const isSpanish = locale === 'es'
   
-  // Traducciones para servicios
   const tServices = await getTranslations({ locale: locale, namespace: 'services' })
   
-  // Mapeo de slugs español a inglés para traducciones
   const serviceSlugMap: Record<string, string> = {
     'errores-quirurgicos': 'surgical-errors',
     'errores-diagnostico': 'diagnostic-errors',
@@ -156,61 +146,50 @@ export default async function CiudadPage({
     'errores-medicacion': 'medication-errors',
     'consentimiento-informado': 'informed-consent',
   }
-  
-  const benefits = isSpanish
-    ? [
-        `Abogados especializados en negligencias médicas en ${city.name}`,
-        'Bufete con trayectoria desde 1946',
-        'Te escuchamos y analizamos tu caso',
-        'Colaboración con peritos médicos especializados',
-        'Acompañamiento durante todo el proceso',
-        `Atención personalizada en toda ${city.province}`,
-      ]
-    : [
-        `Lawyers specialized in medical negligence in ${city.name}`,
-        'Law firm with track record since 1946',
-        'We listen and analyze your case',
-        'Collaboration with specialized medical experts',
-        'Support throughout the process',
-        `Personalized attention throughout ${city.province}`,
-      ]
 
-  // FAQs específicas de la ciudad para JSON-LD
   const cityFaqs = isSpanish
     ? [
         {
-          question: `¿Cómo puedo consultar con un abogado de negligencias médicas en ${city.name}?`,
-          answer: `En GVC Expertos te escuchamos y analizamos tu caso con rigor, orientándote con honestidad sobre las opciones disponibles. Puedes contactarnos por teléfono o email.`,
+          question: `¿Tenéis despacho en ${city.name}?`,
+          answer: `No. La sede está en Murcia (Plaza Fuensanta). Si el error médico ocurrió en ${city.name}, podemos llevar el caso igual: teléfono, videoconferencia, historia clínica y, si hace falta, nos desplazamos.`,
+        },
+        {
+          question: `¿Cómo consulto un caso de negligencia médica ocurrido en ${city.name}?`,
+          answer: `Llámanos al ${siteConfig.contact.phone} o escribe a ${siteConfig.contact.email}. Da igual que estés en ${city.name} o en otro sitio: te escuchamos, analizamos la documentación y te orientamos con honestidad.`,
         },
         {
           question: `¿Cómo sé si tengo un caso de negligencia médica en ${city.name}?`,
-          answer: `Si has sufrido un daño debido a un error médico, diagnóstico tardío o tratamiento inadecuado en ${city.name}, podrías tener un caso. Contacta con nosotros y analizaremos tu situación con rigor profesional.`,
+          answer: `Si has sufrido un daño por un error médico, diagnóstico tardío o tratamiento inadecuado en ${city.name}, puede haber caso. Contacta con nosotros y analizaremos tu situación con rigor profesional.`,
         },
         {
-          question: `¿Cuánto tiempo tengo para reclamar por negligencia médica en ${city.name}?`,
-          answer: `El plazo general es de 1 año desde que conoces el daño o desde que finaliza el tratamiento. Sin embargo, cada caso es diferente. Te recomendamos consultarnos lo antes posible para no perder tus derechos.`,
+          question: `¿Cuánto tiempo tengo para reclamar por un daño ocurrido en ${city.name}?`,
+          answer: `El plazo general es de 1 año desde que conoces el daño o desde que finaliza el tratamiento. Cada caso es distinto. Consúltanos cuanto antes para no perder derechos.`,
         },
         {
-          question: `¿Qué hospitales de ${city.name} atendéis?`,
-          answer: `Atendemos casos de negligencias médicas ocurridas en todos los hospitales de ${city.name}, tanto públicos como privados. Trabajamos con peritos médicos especializados para analizar cada caso.`,
+          question: `¿Qué hospitales de ${city.name} cubrís?`,
+          answer: `Cubrimos casos ocurridos en hospitales públicos y privados de ${city.name}. El análisis lo hacemos con peritos; no hace falta una sucursal en la ciudad.`,
         },
       ]
     : [
         {
-          question: `How can I consult with a medical negligence lawyer in ${city.name}?`,
-          answer: `At GVC Expertos we listen to you and analyze your case with rigor, guiding you honestly about the available options. You can contact us by phone or email.`,
+          question: `Do you have an office in ${city.name}?`,
+          answer: `No. The firm is in Murcia (Plaza Fuensanta). If the medical error occurred in ${city.name}, we can still handle the case: phone, videocall, medical records and travel if needed.`,
+        },
+        {
+          question: `How do I consult a medical negligence case that happened in ${city.name}?`,
+          answer: `Call ${siteConfig.contact.phone} or email ${siteConfig.contact.email}. It does not matter if you are in ${city.name} or elsewhere: we listen, review the records and advise you honestly.`,
         },
         {
           question: `How do I know if I have a medical negligence case in ${city.name}?`,
-          answer: `If you have suffered harm due to a medical error, late diagnosis or inadequate treatment in ${city.name}, you could have a case. Contact us and we will analyze your situation with professional rigor.`,
+          answer: `If you suffered harm due to a medical error, late diagnosis or inadequate treatment in ${city.name}, you may have a case. Contact us and we will review it with professional rigor.`,
         },
         {
-          question: `How long do I have to claim for medical negligence in ${city.name}?`,
-          answer: `The general term is 1 year from when you know about the damage or from when treatment ends. However, each case is different. We recommend consulting us as soon as possible so as not to lose your rights.`,
+          question: `How long do I have to claim for harm that occurred in ${city.name}?`,
+          answer: `The general term is 1 year from when you know about the damage or when treatment ends. Each case is different. Contact us as soon as possible so as not to lose your rights.`,
         },
         {
           question: `Which hospitals in ${city.name} do you cover?`,
-          answer: `We handle medical negligence cases that occur in all hospitals in ${city.name}, both public and private. We work with specialized medical experts to analyze each case.`,
+          answer: `We handle cases that occurred in public and private hospitals in ${city.name}. We work with medical experts; there is no need for a local branch.`,
         },
       ]
 
@@ -219,7 +198,7 @@ export default async function CiudadPage({
         {
           icon: Shield,
           title: 'Especialización',
-          description: `Abogados especializados en negligencias médicas con conocimiento del sistema sanitario de ${city.province}.`,
+          description: `Especialistas en negligencias médicas. El caso puede haber ocurrido en ${city.province}; la dirección es desde Murcia.`,
         },
         {
           icon: Award,
@@ -241,7 +220,7 @@ export default async function CiudadPage({
         {
           icon: Shield,
           title: 'Specialization',
-          description: `Lawyers specialized in medical negligence with knowledge of the healthcare system in ${city.province}.`,
+          description: `Lawyers specialized in medical negligence. The case may have occurred in ${city.province}; the file is run from Murcia.`,
         },
         {
           icon: Award,
@@ -280,7 +259,7 @@ export default async function CiudadPage({
         {
           number: '04',
           title: 'Defensa',
-          description: `Si procede, defendemos tu caso ante los tribunales de ${city.province} con rigor profesional.`,
+          description: `Si procede, defendemos tu caso ante los tribunales competentes (el daño en ${city.province} se tramita allí; el despacho está en Murcia).`,
         },
         {
           number: '05',
@@ -307,7 +286,7 @@ export default async function CiudadPage({
         {
           number: '04',
           title: 'Defense',
-          description: `If appropriate, we defend your case in the courts of ${city.province} with professional rigor.`,
+          description: `If appropriate, we defend your case before the competent courts (harm in ${city.province} is heard there; the firm is in Murcia).`,
         },
         {
           number: '05',
@@ -323,8 +302,7 @@ export default async function CiudadPage({
         cityName={city.name}
         citySlug={city.slug}
         province={city.province}
-        latitude={coords?.lat}
-        longitude={coords?.lng}
+        locale={locale}
       />
       <JsonLdBreadcrumbs
         items={[
@@ -366,7 +344,9 @@ export default async function CiudadPage({
             <div className="inline-flex items-center gap-2 bg-gold/20 border border-gold/30 rounded-full px-4 py-2 mb-6">
               <MapPin className="w-4 h-4 text-gold" />
               <span className="text-gold text-sm font-medium">
-                {city.name}, {city.community}
+                {isSpanish
+                  ? `${city.name} · despacho en Murcia`
+                  : `${city.name} · office in Murcia`}
               </span>
             </div>
 
@@ -386,8 +366,8 @@ export default async function CiudadPage({
 
             <p className="text-xl text-gray-300 leading-relaxed mb-8">
               {isSpanish
-                ? `Bufete de abogados con trayectoria desde 1946, especializado en negligencias médicas en ${city.name}. Te escuchamos, analizamos tu caso y te orientamos con rigor y honestidad.`
-                : `Law firm with a track record since 1946, specialized in medical negligence in ${city.name}. We listen to you, analyze your case and guide you with rigor and honesty.`}
+                ? `Si el error médico ocurrió en ${city.name}, podemos llevar tu caso desde Murcia en todo el territorio: videoconferencia, historia clínica y, si hace falta, desplazamiento. Te escuchamos y te orientamos con rigor.`
+                : `If the medical error occurred in ${city.name}, we can handle your case from Murcia nationwide: videocall, medical records and travel if needed. We listen and advise you with rigor.`}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
@@ -438,13 +418,13 @@ export default async function CiudadPage({
             </div>
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-charcoal mb-4">
               {isSpanish 
-                ? `Tipos de Negligencias Médicas que Atendemos en ${city.name}`
-                : `Types of Medical Negligence We Handle in ${city.name}`}
+                ? `Tipos de negligencias médicas en casos de ${city.name}`
+                : `Types of medical negligence in cases from ${city.name}`}
             </h2>
             <p className="text-gray-600 text-lg">
               {isSpanish
-                ? `Defendemos a víctimas de errores médicos en todos los hospitales y centros sanitarios de ${city.province}.`
-                : `We defend victims of medical errors in all hospitals and health centers in ${city.province}.`}
+                ? `Defendemos a víctimas de errores médicos ocurridos en ${city.province}. El despacho está en Murcia.`
+                : `We defend victims of medical errors that occurred in ${city.province}. The firm is in Murcia.`}
             </p>
           </div>
 
@@ -492,8 +472,8 @@ export default async function CiudadPage({
               </h2>
               <p className="text-gray-600 text-lg">
                 {isSpanish
-                  ? `Atendemos casos de negligencias médicas en estos y otros hospitales de ${city.name}.`
-                  : `We handle medical negligence cases in these and other hospitals in ${city.name}.`}
+                  ? `Atendemos casos ocurridos en estos y otros hospitales de ${city.name}. El despacho está en Murcia.`
+                  : `We handle cases that occurred in these and other hospitals in ${city.name}. The firm is in Murcia.`}
               </p>
             </div>
 
@@ -556,28 +536,28 @@ export default async function CiudadPage({
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-block bg-gold/10 text-gold px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                {isSpanish ? 'Contexto Local' : 'Local Context'}
+                {isSpanish ? 'Dónde ocurrió el daño' : 'Where the harm occurred'}
               </div>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-charcoal mb-6">
                 {isSpanish 
-                  ? `La Sanidad en ${city.name}` 
+                  ? `La sanidad en ${city.name}` 
                   : `Healthcare in ${city.name}`}
                 </h2>
               <div className="prose prose-lg max-w-none text-gray-600">
                 <p>
                   {isSpanish
-                    ? `${city.name} cuenta con una red sanitaria que incluye hospitales públicos y privados que atienden a la población de ${city.province}. Sin embargo, como en cualquier sistema sanitario, pueden producirse errores médicos que causan daños a los pacientes.`
-                    : `${city.name} has a healthcare network that includes public and private hospitals serving the population of ${city.province}. However, as in any healthcare system, medical errors can occur that cause harm to patients.`}
+                    ? `${city.name} cuenta con una red sanitaria que incluye hospitales públicos y privados que atienden a la población de ${city.province}. Como en cualquier sistema sanitario, pueden producirse errores médicos que causan daños a los pacientes.`
+                    : `${city.name} has a healthcare network that includes public and private hospitals serving the population of ${city.province}. As in any healthcare system, medical errors can occur that cause harm to patients.`}
                 </p>
                 <p>
                   {isSpanish
-                    ? `Los casos más comunes de negligencias médicas en ${city.name} incluyen errores quirúrgicos, diagnósticos tardíos, infecciones nosocomiales, y errores de medicación. Nuestro despacho conoce en profundidad el funcionamiento de los hospitales de ${city.province} y los protocolos médicos locales.`
-                    : `The most common cases of medical negligence in ${city.name} include surgical errors, late diagnoses, hospital-acquired infections, and medication errors. Our firm has in-depth knowledge of how hospitals in ${city.province} operate and local medical protocols.`}
+                    ? `Los casos más comunes incluyen errores quirúrgicos, diagnósticos tardíos, infecciones nosocomiales y errores de medicación. Analizamos la historia clínica y los protocolos del centro con peritos. No hace falta que el despacho esté en ${city.name}: la sede es Murcia y el servicio cubre todo el territorio.`
+                    : `The most common cases include surgical errors, late diagnoses, hospital-acquired infections and medication errors. We review the medical records and the hospital protocols with experts. The firm does not need to be in ${city.name}: the office is in Murcia and we cover all of Spain.`}
                 </p>
                 <p>
                   {isSpanish
-                    ? `Si has sufrido una negligencia médica en ${city.name}, es fundamental actuar rápidamente. Los plazos legales son estrictos y la recopilación de pruebas es crucial para el éxito del caso.`
-                    : `If you have suffered medical negligence in ${city.name}, it is essential to act quickly. Legal deadlines are strict and evidence gathering is crucial to the success of the case.`}
+                    ? `Si has sufrido una negligencia médica en ${city.name}, conviene actuar pronto. Los plazos son estrictos y la prueba es clave para el caso.`
+                    : `If you have suffered medical negligence in ${city.name}, it is worth acting soon. Deadlines are strict and evidence is crucial.`}
                 </p>
               </div>
             </div>
@@ -603,13 +583,13 @@ export default async function CiudadPage({
             </div>
             <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
               {isSpanish 
-                ? `Por Qué Elegirnos en ${city.name}`
-                : `Why Choose Us in ${city.name}`}
+                ? `Por qué un despacho de Murcia para un caso en ${city.name}`
+                : `Why a Murcia firm for a case in ${city.name}`}
             </h2>
             <p className="text-gray-400 text-lg">
               {isSpanish
-                ? 'Somos el despacho de referencia en negligencias médicas por estas razones.'
-                : 'We are the reference law firm in medical negligence for these reasons.'}
+                ? 'Especialistas en negligencias médicas. Sede en Murcia, casos en toda España.'
+                : 'Medical negligence specialists. Based in Murcia, cases nationwide.'}
             </p>
           </div>
 
@@ -636,8 +616,8 @@ export default async function CiudadPage({
             </div>
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-charcoal mb-4">
               {isSpanish 
-                ? `Cómo Trabajamos en ${city.name}`
-                : `How We Work in ${city.name}`}
+                ? `Cómo llevamos un caso ocurrido en ${city.name}`
+                : `How we handle a case that occurred in ${city.name}`}
             </h2>
             <p className="text-gray-600 text-lg">
               {isSpanish
@@ -684,8 +664,8 @@ export default async function CiudadPage({
               </div>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-charcoal mb-4">
                 {isSpanish 
-                  ? `Dudas sobre Negligencias Médicas en ${city.name}`
-                  : `Questions about Medical Negligence in ${city.name}`}
+                  ? `Dudas sobre un caso de ${city.name}`
+                  : `Questions about a case in ${city.name}`}
               </h2>
             </div>
 

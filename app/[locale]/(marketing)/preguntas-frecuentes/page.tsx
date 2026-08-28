@@ -115,7 +115,7 @@ const faqCategoriesEs = [
         id: 'q12',
         title: '¿Trabajáis en toda España?',
         content:
-          'Sí, atendemos casos en toda España. Tenemos sede en Murcia y podemos gestionar tu caso independientemente de dónde te encuentres.',
+          'Sí. El despacho está en Murcia (Plaza Fuensanta). Los servicios de negligencias médicas se prestan en todo el territorio: el daño puede haber ocurrido en cualquier ciudad; la dirección del caso es desde Murcia (teléfono, videoconferencia, documentación y, si hace falta, desplazamiento).',
       },
       {
         id: 'q13',
@@ -216,7 +216,7 @@ const faqCategoriesEn = [
         id: 'q12',
         title: 'Do you work throughout Spain?',
         content:
-          'Yes, we handle cases throughout Spain. We have offices in Murcia and we can manage your case regardless of where you are.',
+          'Yes. The firm is in Murcia (Plaza Fuensanta). Medical negligence services are provided nationwide: the harm may have occurred in any city; the case is run from Murcia (phone, videocall, records and travel if needed).',
       },
       {
         id: 'q13',

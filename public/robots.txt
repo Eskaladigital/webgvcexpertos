@@ -1,11 +1,12 @@
 # Robots.txt para GVC Expertos
-# https://gvcexpertos.es
+# https://www.gvcexpertos.com
+# En Next manda app/robots.ts; este archivo no debe citar el dominio viejo.
 
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://gvcexpertos.es/sitemap.xml
+Sitemap: https://www.gvcexpertos.com/sitemap.xml
 
 # Bloquear áreas administrativas
 Disallow: /admin/
