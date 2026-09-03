@@ -23,13 +23,71 @@ const contactSchema = z.object({
   utm_source: z.string().optional(),
   utm_medium: z.string().optional(),
   utm_campaign: z.string().optional(),
+  website: z.string().optional(),
+  form_started_at: z.union([z.string(), z.number()]).optional(),
 })
+
+/** Token tipo bot: una sola palabra, mayúsculas en medio (iNgXrKYUMiecBwtr). */
+function looksLikeRandomToken(value: string): boolean {
+  const t = value.trim()
+  if (t.length < 12 || /\s/.test(t) || !/^[A-Za-z0-9]+$/.test(t)) return false
+  const innerCaps = t.slice(1).replace(/[^A-Z]/g, '').length
+  const lowers = (t.match(/[a-z]/g) || []).length
+  const uppers = (t.match(/[A-Z]/g) || []).length
+  return innerCaps >= 3 && lowers >= 3 && uppers >= 3
+}
+
+/** Gmail con muchos puntos en el local: n.u.k.og.i.sul.i76.6@gmail.com */
+function dottedGmailSpam(email: string): boolean {
+  const [local, domain] = email.toLowerCase().split('@')
+  if (!domain?.endsWith('gmail.com') || !local) return false
+  return (local.match(/\./g) || []).length >= 4
+}
+
+/** Pitch de copywriter / Calendly (Hannah Melotto 2–3 sep y el mismo molde). */
+function looksLikeWriterPitch(message: string): boolean {
+  const m = message.toLowerCase()
+  const hasCalendly = m.includes('calendly.com')
+  const writer = /freelance writer|writing projects|thought leadership|press releases/.test(m)
+  return hasCalendly && writer
+}
+
+function isBotSubmission(input: {
+  name: string
+  email: string
+  message: string
+  website: string
+  startedAt: string
+}): boolean {
+  if (input.website) return true
+  const started = Number(input.startedAt)
+  if (!Number.isFinite(started) || started <= 0) return true
+  const elapsed = Date.now() - started
+  if (elapsed < 2500 || elapsed > 24 * 60 * 60 * 1000) return true
+  if (looksLikeRandomToken(input.name) && looksLikeRandomToken(input.message)) return true
+  if (dottedGmailSpam(input.email) && looksLikeRandomToken(input.name)) return true
+  if (looksLikeWriterPitch(input.message)) return true
+  return false
+}
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const body = await request.json()
     const validatedData = contactSchema.parse(body)
+
+    if (isBotSubmission({
+      name: validatedData.name,
+      email: validatedData.email,
+      message: validatedData.message,
+      website: String(validatedData.website || '').trim(),
+      startedAt: String(validatedData.form_started_at || ''),
+    })) {
+      return NextResponse.json({
+        success: true,
+        message: 'Mensaje enviado correctamente',
+      })
+    }
 
     // Buscar service_id si se proporcionó nombre de servicio
     let serviceId = null

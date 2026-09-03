@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Loader2, CheckCircle } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
@@ -21,6 +21,11 @@ export function ContactForm({ services }: ContactFormProps) {
   const [isSuccess, setIsSuccess] = useState(false)
   const [contactType, setContactType] = useState('particular')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [formStartedAt, setFormStartedAt] = useState(0)
+
+  useEffect(() => {
+    setFormStartedAt(Date.now())
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -62,6 +67,8 @@ export function ContactForm({ services }: ContactFormProps) {
         body: JSON.stringify({
           ...data,
           gdpr_consent: data.privacy,
+          website: formData.get('website') as string,
+          form_started_at: formStartedAt,
         }),
       })
       if (!res.ok) {
@@ -94,7 +101,11 @@ export function ContactForm({ services }: ContactFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="relative space-y-6">
+      <div className="absolute left-[-9999px] h-px w-px overflow-hidden" aria-hidden="true">
+        <label htmlFor="website">Sitio web</label>
+        <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" />
+      </div>
       <Select
         name="contact_type"
         label={t('contactType')}
